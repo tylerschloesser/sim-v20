@@ -8,6 +8,7 @@ import {
   useState,
 } from 'react'
 import { createRoot } from 'react-dom/client'
+import { BehaviorSubject } from 'rxjs'
 import invariant from 'tiny-invariant'
 import './index.css'
 import { PointerController } from './pointer-controller'
@@ -20,6 +21,11 @@ createRoot(container).render(
   <StrictMode>
     <App />
   </StrictMode>,
+)
+
+// @ts-expect-error
+const viewport$ = new BehaviorSubject<Vec2>(
+  new Vec2(window.innerWidth, window.innerHeight),
 )
 
 function App() {
