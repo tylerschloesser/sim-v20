@@ -1,5 +1,11 @@
 import clsx from 'clsx'
-import { StrictMode, useEffect, useRef } from 'react'
+import {
+  PointerEventHandler,
+  StrictMode,
+  useCallback,
+  useEffect,
+  useRef,
+} from 'react'
 import { createRoot } from 'react-dom/client'
 import invariant from 'tiny-invariant'
 import './index.css'
@@ -20,10 +26,16 @@ function App() {
     invariant(container.current)
   }, [])
 
+  const onPointerDown: PointerEventHandler<HTMLDivElement> =
+    useCallback((ev) => {
+      console.log(ev)
+    }, [])
+
   return (
     <div
+      onPointerDown={onPointerDown}
       className={clsx(
-        'w-20 h-20',
+        'w-40 h-40',
         'bg-red-500 border-2 border-black',
         'cursor-pointer',
       )}
