@@ -31,13 +31,30 @@ interface AppState {
 const AppContext = createContext({})
 
 export function App() {
-  const [
-    state,
-    // @ts-expect-error
-    setState,
-  ] = useImmer<AppState>({ tick: 0 })
+  const [state, setState] = useImmer<AppState>({ tick: 0 })
+
+  useEffect(() => {
+    const interval = self.setInterval(() => {
+      setState((draft) => {
+        draft.tick++
+      })
+    }, 100)
+    return () => {
+      self.clearInterval(interval)
+    }
+  }, [])
+
   return (
     <AppContext value={state}>
+      <div
+        className={clsx(
+          'absolute',
+          'bottom-0 right-0',
+          'font-mono opacity-50',
+        )}
+      >
+        {state.tick}
+      </div>
       <Resource />
       <div
         className={clsx('absolute', 'pointer-events-none')}
