@@ -5,6 +5,7 @@ import {
   useCallback,
   useEffect,
   useRef,
+  useState,
 } from 'react'
 import { createRoot } from 'react-dom/client'
 import invariant from 'tiny-invariant'
@@ -22,12 +23,34 @@ createRoot(container).render(
 )
 
 function App() {
-  return <Rect />
+  return (
+    <>
+      <div
+        className={clsx('absolute', 'pointer-events-none')}
+      >
+        <Rect />
+      </div>
+      <div className="w-dvw h-dvh flex items-center justify-center">
+        <div
+          onPointerOver={() => {
+            console.log('enter!')
+          }}
+          className={clsx(
+            'w-40 h-40 p-2',
+            'border-2 border-black bg-red-300',
+          )}
+        >
+          Iron
+        </div>
+      </div>
+    </>
+  )
 }
 
 function Rect() {
   const container = useRef<HTMLDivElement>(null)
   const position = useRef<Vec2>(Vec2.ZERO)
+  const [down, setDown] = useState(false)
 
   useEffect(() => {
     invariant(container.current)
@@ -36,6 +59,7 @@ function Rect() {
   const onPointerDown: PointerEventHandler<HTMLDivElement> =
     useCallback((ev) => {
       invariant(container.current)
+      setDown(true)
       new PointerController({
         pointerId: ev.pointerId,
         container: container.current,
@@ -44,21 +68,44 @@ function Rect() {
           position.current = position.current.add(drag)
           const { x, y } = position.current
           container.current.style.transform = `translate(${x}px, ${y}px)`
+
+          document.body.classList.add('cursor-pointer')
+          document.body.classList.add('select-none')
+        },
+        onComplete: () => {
+          setDown(false)
+          document.body.classList.remove('cursor-pointer')
+          document.body.classList.remove('select-none')
         },
       })
     }, [])
 
   return (
     <div
-      onPointerDown={onPointerDown}
-      className={clsx(
-        'w-40 h-40',
-        'bg-red-500 border-2 border-black',
-        'cursor-pointer',
-      )}
       ref={container}
+      className={clsx('absolute', 'w-40 h-40')}
     >
-      TODO
+      <div
+        onPointerDown={onPointerDown}
+        className={clsx(
+          'absolute',
+          'inset-0',
+          'border-2 border-black',
+          'cursor-pointer',
+          down
+            ? 'pointer-events-none'
+            : 'pointer-events-auto',
+        )}
+      ></div>
+      <div
+        className={clsx(
+          'absolute',
+          'bottom-full',
+          'pointer-events-auto',
+        )}
+      >
+        TODO
+      </div>
     </div>
   )
 }

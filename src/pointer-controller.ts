@@ -1,11 +1,13 @@
 import { Vec2 } from './vec2'
 
 type DragCallback = (delta: Vec2) => void
+type CompleteCallback = () => void
 
 export interface PointerControllerConstructorArgs {
   pointerId: number
   container: HTMLElement
   onDrag: DragCallback
+  onComplete: CompleteCallback
 }
 
 export class PointerController {
@@ -19,11 +21,13 @@ export class PointerController {
     // @ts-ignore
     container,
     onDrag,
+    onComplete,
   }: PointerControllerConstructorArgs) {
     this.pointerId = pointerId
-    this.onDrag = () => {}
-    const { signal } = this.abortController
     this.onDrag = onDrag
+
+    const { signal } = this.abortController
+    signal.addEventListener('abort', onComplete)
 
     function filter(fn: (ev: PointerEvent) => void) {
       return (ev: PointerEvent) => {
@@ -55,8 +59,7 @@ export class PointerController {
     this.lastPosition = position
   }
 
-  onPointerUp = (ev: PointerEvent) => {
-    console.log('onPointerUp', ev)
+  onPointerUp = () => {
     this.abortController.abort()
   }
 }
