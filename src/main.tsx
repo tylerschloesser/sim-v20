@@ -8,7 +8,13 @@ import {
   useState,
 } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BehaviorSubject } from 'rxjs'
+import {
+  BehaviorSubject,
+  combineLatest,
+  distinctUntilChanged,
+  map,
+  shareReplay,
+} from 'rxjs'
 import invariant from 'tiny-invariant'
 import './index.css'
 import { PointerController } from './pointer-controller'
@@ -23,7 +29,6 @@ createRoot(container).render(
   </StrictMode>,
 )
 
-// @ts-expect-error
 const viewport$ = new BehaviorSubject<Vec2>(
   new Vec2(window.innerWidth, window.innerHeight),
 )
@@ -42,19 +47,52 @@ function App() {
 }
 
 function Resource() {
+  const container = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    invariant(container.current)
+    const rect$ = new BehaviorSubject<DOMRectReadOnly>(
+      container.current.getBoundingClientRect(),
+    )
+    const resizeObserver = new ResizeObserver((entries) => {
+      invariant(entries.length === 1)
+      const entry = entries.at(0)
+      invariant(entry)
+      rect$.next(entry.contentRect)
+    })
+    resizeObserver.observe(container.current)
+    const size$ = rect$.pipe(
+      map((rect) => new Vec2(rect.width, rect.height)),
+      distinctUntilChanged(),
+      shareReplay(1),
+    )
+
+    combineLatest([viewport$, size$]).subscribe(
+      ([viewport, size]) => {
+        invariant(container.current)
+        const { x, y } = viewport.div(2).sub(size.div(2))
+        // prettier-ignore
+        container.current.style.transform = `translate(${x}px, ${y}px)`
+      },
+    )
+
+    return () => {
+      resizeObserver.disconnect()
+      rect$.complete() // TODO what is this?
+    }
+  }, [])
   return (
-    <div className="w-dvw h-dvh flex items-center justify-center">
-      <div
-        onPointerOver={() => {
-          console.log('enter!')
-        }}
-        className={clsx(
-          'w-40 h-40 p-2',
-          'border-2 border-black bg-red-300',
-        )}
-      >
-        Iron
-      </div>
+    <div
+      ref={container}
+      onPointerOver={() => {
+        console.log('enter!')
+      }}
+      className={clsx(
+        'absolute',
+        'w-40 h-40 p-2',
+        'border-2 border-black bg-red-300',
+      )}
+    >
+      Iron
     </div>
   )
 }
