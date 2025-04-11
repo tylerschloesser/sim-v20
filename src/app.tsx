@@ -1,23 +1,33 @@
+import {
+  state,
+  StateObservable,
+  Subscribe,
+  useStateObservable,
+} from '@react-rxjs/core'
 import clsx from 'clsx'
+import { isEqual } from 'lodash-es'
 import {
   createContext,
   PointerEventHandler,
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react'
-import { BehaviorSubject } from 'rxjs'
+import {
+  BehaviorSubject,
+  combineLatest,
+  distinctUntilChanged,
+  map,
+  takeUntil,
+} from 'rxjs'
 import invariant from 'tiny-invariant'
-import { Updater, useImmer } from 'use-immer'
 import './index.css'
 import { PointerController } from './pointer-controller'
+import { useEffectWithDestroy } from './use-effect-with-destroy'
 import { Vec2 } from './vec2'
-
-const viewport$ = new BehaviorSubject<Vec2>(
-  new Vec2(window.innerWidth, window.innerHeight),
-)
 
 interface Entity {
   id: string
@@ -25,103 +35,126 @@ interface Entity {
   size: Vec2
 }
 
-interface AppState {
-  tick: number
-  over: boolean
+interface World {
   entities: Record<string, Entity>
   nextEntityId: number
-  scale: number
 }
 
-const AppContext = createContext<{
-  state: AppState
-  setState: Updater<AppState>
-}>(null!)
+interface AppContext {
+  world$: StateObservable<World>
+}
 
-function initState(): AppState {
-  const scale = Math.min(
-    viewport$.value.x,
-    viewport$.value.y,
-  )
-  const state: AppState = {
-    tick: 0,
-    over: false,
+const AppContext = createContext<AppContext>(null!)
+
+function initWorld(): World {
+  const world: World = {
     entities: {},
     nextEntityId: 0,
-    scale,
   }
-
   function addEntity({
     position,
     size,
   }: Omit<Entity, 'id'>) {
-    const id = `${state.nextEntityId++}`
-    state.entities[id] = {
+    const id = `${world.nextEntityId++}`
+    world.entities[id] = {
       id,
       position: position,
       size: size,
     }
   }
-
   addEntity({
     position: new Vec2(0, 0),
     size: new Vec2(1, 1),
   })
-
-  return state
+  addEntity({
+    position: new Vec2(2, 0),
+    size: new Vec2(1, 1),
+  })
+  return world
 }
 
-export function App() {
-  const [state, setState] = useImmer<AppState>(initState)
+const world$ = new BehaviorSubject<World>(initWorld())
+const viewport$ = new BehaviorSubject<Vec2>(
+  new Vec2(window.innerWidth, window.innerHeight),
+)
+const boundingBox$ = world$.pipe(
+  map((world) => {
+    let tl = new Vec2(Number.MAX_SAFE_INTEGER)
+    let br = new Vec2(Number.MIN_SAFE_INTEGER)
+    Object.values(world.entities).forEach((entity) => {
+      tl = tl.min(entity.position)
+      br = br.max(entity.position.add(entity.size))
+    })
+    const size = br.sub(tl)
+    return { position: tl, size }
+  }),
+  distinctUntilChanged(isEqual),
+)
 
-  useEffect(() => {
-    const interval = self.setInterval(() => {
-      setState((draft) => {
-        draft.tick++
-      })
-    }, 100)
-    return () => {
-      self.clearInterval(interval)
+const transform$ = combineLatest([
+  viewport$,
+  boundingBox$,
+]).pipe(
+  map(([viewport, boundingBox]) => {
+    const scale = Math.min(
+      viewport.x / boundingBox.size.x,
+      viewport.y / boundingBox.size.y,
+    )
+    return {
+      translate: Vec2.ZERO,
+      scale,
+    }
+  }),
+)
+
+export function App() {
+  const context = useMemo<AppContext>(() => {
+    return {
+      world$: state(world$),
     }
   }, [])
-
-  useEffect(() => {
-    console.log('over', state.over)
-  }, [state.over])
-
   return (
-    <AppContext value={{ state, setState }}>
-      <div
-        className={clsx(
-          'absolute',
-          'bottom-0 right-0',
-          'pointer-events-none select-none',
-          'p-1',
-          'font-mono text-xs opacity-50',
-        )}
-      >
-        {state.tick}
-      </div>
-      <EntityComponentGrid />
-      <div
-        className={clsx('absolute', 'pointer-events-none')}
-      >
-        <Rect />
-      </div>
-    </AppContext>
+    <Subscribe>
+      <AppContext value={context}>
+        <div
+          className={clsx(
+            'absolute',
+            'bottom-0 right-0',
+            'pointer-events-none select-none',
+            'p-1',
+            'font-mono text-xs opacity-50',
+          )}
+        >
+          {0}
+        </div>
+        <EntityComponentGrid />
+        <div
+          className={clsx(
+            'absolute',
+            'pointer-events-none',
+          )}
+        >
+          <Rect />
+        </div>
+      </AppContext>
+    </Subscribe>
   )
 }
 
 function EntityComponentGrid() {
-  const {
-    state: { entities },
-  } = useContext(AppContext)
+  const { world$ } = useContext(AppContext)
+  const world = useStateObservable(world$)
+  const ref = useRef<HTMLDivElement>(null)
+
   return (
-    <>
-      {Object.values(entities).map((entity) => (
+    <div
+      ref={ref}
+      className={clsx('absolute origin-top-left')}
+    >
+      {Object.values(world.entities).map((entity) => (
         <EntityComponent key={entity.id} entity={entity} />
       ))}
-    </>
+    </div>
   )
 }
 
@@ -130,32 +163,40 @@ interface EntityComponentProps {
 }
 
 function EntityComponent({ entity }: EntityComponentProps) {
-  const {
-    state: { scale },
-  } = useContext(AppContext)
-  const { setState } = useContext(AppContext)
-  const setOver = useCallback(
-    (over: boolean) => {
-      setState((draft) => {
-        draft.over = over
-      })
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffectWithDestroy(
+    (destroy$) => {
+      transform$
+        .pipe(takeUntil(destroy$))
+        .subscribe(({ translate, scale }) => {
+          invariant(ref.current)
+          const { x, y } = entity.position
+            .add(translate)
+            .mul(scale)
+          console.log(x, y)
+          ref.current.style.translate = `${x}px ${y}px`
+        })
     },
-    [setState],
+    [entity.position],
+  )
+
+  useEffectWithDestroy(
+    (destroy$) => {
+      transform$
+        .pipe(takeUntil(destroy$))
+        .subscribe(({ scale }) => {
+          invariant(ref.current)
+          ref.current.style.width = `${entity.size.x * scale}px`
+          ref.current.style.height = `${entity.size.y * scale}px`
+        })
+    },
+    [entity.size],
   )
 
   return (
     <div
-      onPointerOver={() => {
-        setOver(true)
-      }}
-      onPointerOut={() => {
-        setOver(false)
-      }}
-      style={{
-        width: entity.size.x * scale,
-        height: entity.size.y * scale,
-        transform: `translate(${entity.position.x * scale}px, ${entity.position.y * scale}px)`,
-      }}
+      ref={ref}
       className={clsx(
         'absolute',
         'border-2 border-black bg-red-300',

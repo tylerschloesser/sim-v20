@@ -91,6 +91,20 @@ export class Vec2 {
     return fn(this)
   }
 
+  min(v: Vec2): Vec2 {
+    return new Vec2(
+      Math.min(this.x, v.x),
+      Math.min(this.y, v.y),
+    )
+  }
+
+  max(v: Vec2): Vec2 {
+    return new Vec2(
+      Math.max(this.x, v.x),
+      Math.max(this.y, v.y),
+    )
+  }
+
   static ZERO = new Vec2(0, 0)
 
   static isEqual(a: Vec2, b: Vec2): boolean {
