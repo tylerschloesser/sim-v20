@@ -18,6 +18,17 @@ createRoot(container).render(
     <App />
   </StrictMode>,
 )
+interface PointerControllerConstructorArgs {
+  container: HTMLElement
+}
+
+class PointerController {
+  constructor({
+    container,
+  }: PointerControllerConstructorArgs) {
+    console.log(container)
+  }
+}
 
 function App() {
   const container = useRef<HTMLDivElement>(null)
@@ -27,8 +38,12 @@ function App() {
   }, [])
 
   const onPointerDown: PointerEventHandler<HTMLDivElement> =
+    // @ts-expect-error
     useCallback((ev) => {
-      console.log(ev)
+      invariant(container.current)
+      new PointerController({
+        container: container.current,
+      })
     }, [])
 
   return (
