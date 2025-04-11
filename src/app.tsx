@@ -3,6 +3,7 @@ import {
   createContext,
   PointerEventHandler,
   useCallback,
+  useContext,
   useEffect,
   useRef,
   useState,
@@ -15,7 +16,7 @@ import {
   shareReplay,
 } from 'rxjs'
 import invariant from 'tiny-invariant'
-import { useImmer } from 'use-immer'
+import { Updater, useImmer } from 'use-immer'
 import './index.css'
 import { PointerController } from './pointer-controller'
 import { Vec2 } from './vec2'
@@ -24,14 +25,64 @@ const viewport$ = new BehaviorSubject<Vec2>(
   new Vec2(window.innerWidth, window.innerHeight),
 )
 
-interface AppState {
-  tick: number
+interface Entity {
+  id: string
+  position: Vec2
+  size: Vec2
 }
 
-const AppContext = createContext({})
+interface AppState {
+  tick: number
+  over: boolean
+  entities: Record<string, Entity>
+  nextEntityId: number
+  scale: number
+}
+
+const AppContext = createContext<{
+  state: AppState
+  setState: Updater<AppState>
+}>(null!)
+
+function initState(): AppState {
+  const scale = Math.min(
+    viewport$.value.x,
+    viewport$.value.y,
+  )
+  const state: AppState = {
+    tick: 0,
+    over: false,
+    entities: {},
+    nextEntityId: 0,
+    scale,
+  }
+
+  function addEntity({
+    position,
+    size,
+  }: Omit<Entity, 'id'>) {
+    const id = `${state.nextEntityId++}`
+    state.entities[id] = {
+      id,
+      position: position,
+      size: size,
+    }
+  }
+
+  addEntity({
+    position: new Vec2(0, 0),
+    size: new Vec2(1, 1),
+  })
+  addEntity({
+    position: new Vec2(2, 0),
+    size: new Vec2(1, 1),
+  })
+
+  return state
+}
 
 export function App() {
-  const [state, setState] = useImmer<AppState>({ tick: 0 })
+  const [state, setState] = useImmer<AppState>(initState)
 
   useEffect(() => {
     const interval = self.setInterval(() => {
@@ -44,8 +95,12 @@ export function App() {
     }
   }, [])
 
+  useEffect(() => {
+    console.log('over', state.over)
+  }, [state.over])
+
   return (
-    <AppContext value={state}>
+    <AppContext value={{ state, setState }}>
       <div
         className={clsx(
           'absolute',
@@ -57,7 +112,9 @@ export function App() {
       >
         {state.tick}
       </div>
-      <Resource />
+      {Object.values(state.entities).map((entity) => (
+        <EntityComponent key={entity.id} entity={entity} />
+      ))}
       <div
         className={clsx('absolute', 'pointer-events-none')}
       >
@@ -67,7 +124,24 @@ export function App() {
   )
 }
 
-function Resource() {
+interface EntityComponentProps {
+  entity: Entity
+}
+
+function EntityComponent({ entity }: EntityComponentProps) {
+  const {
+    state: { scale },
+  } = useContext(AppContext)
+  const { setState } = useContext(AppContext)
+  const setOver = useCallback(
+    (over: boolean) => {
+      setState((draft) => {
+        draft.over = over
+      })
+    },
+    [setState],
+  )
+
   const container = useRef<HTMLDivElement>(null)
   useEffect(() => {
     invariant(container.current)
@@ -101,15 +175,23 @@ function Resource() {
       rect$.complete() // TODO what is this?
     }
   }, [])
+
   return (
     <div
       ref={container}
       onPointerOver={() => {
-        console.log('enter!')
+        setOver(true)
+      }}
+      onPointerOut={() => {
+        setOver(false)
+      }}
+      style={{
+        width: entity.size.x * scale,
+        height: entity.size.y * scale,
+        transform: `translate(${entity.position.x * scale}px, ${entity.position.y * scale}px)`,
       }}
       className={clsx(
         'absolute',
-        'w-40 h-40 p-2',
         'border-2 border-black bg-red-300',
       )}
     >
