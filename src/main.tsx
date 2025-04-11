@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import {
+  createContext,
   PointerEventHandler,
   StrictMode,
   useCallback,
@@ -33,16 +34,18 @@ const viewport$ = new BehaviorSubject<Vec2>(
   new Vec2(window.innerWidth, window.innerHeight),
 )
 
+const AppContext = createContext(null)
+
 function App() {
   return (
-    <>
+    <AppContext value={null}>
+      <Resource />
       <div
         className={clsx('absolute', 'pointer-events-none')}
       >
         <Rect />
       </div>
-      <Resource />
-    </>
+    </AppContext>
   )
 }
 
