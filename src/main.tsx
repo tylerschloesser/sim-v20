@@ -36,20 +36,26 @@ function App() {
       >
         <Rect />
       </div>
-      <div className="w-dvw h-dvh flex items-center justify-center">
-        <div
-          onPointerOver={() => {
-            console.log('enter!')
-          }}
-          className={clsx(
-            'w-40 h-40 p-2',
-            'border-2 border-black bg-red-300',
-          )}
-        >
-          Iron
-        </div>
-      </div>
+      <Resource />
     </>
+  )
+}
+
+function Resource() {
+  return (
+    <div className="w-dvw h-dvh flex items-center justify-center">
+      <div
+        onPointerOver={() => {
+          console.log('enter!')
+        }}
+        className={clsx(
+          'w-40 h-40 p-2',
+          'border-2 border-black bg-red-300',
+        )}
+      >
+        Iron
+      </div>
+    </div>
   )
 }
 
