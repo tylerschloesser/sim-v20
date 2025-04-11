@@ -50,7 +50,7 @@ export function App() {
         className={clsx(
           'absolute',
           'bottom-0 right-0',
-          'font-mono opacity-50',
+          'font-mono text-xs opacity-50',
         )}
       >
         {state.tick}
