@@ -1,10 +1,13 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
+import invariant from 'tiny-invariant'
 import './index.css'
 
-createRoot(document.getElementById('root')!).render(
+const container = document.getElementById('root')
+invariant(container)
+
+createRoot(container).render(
   <StrictMode>
-    <App />
+    <>TODO</>
   </StrictMode>,
 )
