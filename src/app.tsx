@@ -67,10 +67,6 @@ function initState(): AppState {
     position: new Vec2(0, 0),
     size: new Vec2(1, 1),
   })
-  addEntity({
-    position: new Vec2(2, 0),
-    size: new Vec2(1, 1),
-  })
 
   return state
 }
@@ -106,15 +102,26 @@ export function App() {
       >
         {state.tick}
       </div>
-      {Object.values(state.entities).map((entity) => (
-        <EntityComponent key={entity.id} entity={entity} />
-      ))}
+      <EntityComponentGrid />
       <div
         className={clsx('absolute', 'pointer-events-none')}
       >
         <Rect />
       </div>
     </AppContext>
+  )
+}
+
+function EntityComponentGrid() {
+  const {
+    state: { entities },
+  } = useContext(AppContext)
+  return (
+    <>
+      {Object.values(entities).map((entity) => (
+        <EntityComponent key={entity.id} entity={entity} />
+      ))}
+    </>
   )
 }
 
