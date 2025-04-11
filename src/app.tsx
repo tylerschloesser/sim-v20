@@ -120,11 +120,17 @@ function Rect() {
         },
         onComplete: () => {
           setDown(false)
-          document.body.classList.remove('cursor-pointer')
-          document.body.classList.remove('select-none')
         },
       })
     }, [])
+
+  useEffect(() => {
+    // remove from body AFTER this component is updated
+    if (!down) {
+      document.body.classList.remove('cursor-pointer')
+      document.body.classList.remove('select-none')
+    }
+  }, [down])
 
   return (
     <div
