@@ -24,13 +24,18 @@ const viewport$ = new BehaviorSubject<Vec2>(
   new Vec2(window.innerWidth, window.innerHeight),
 )
 
-interface AppState {}
+interface AppState {
+  tick: number
+}
 
 const AppContext = createContext({})
 
 export function App() {
-  // @ts-expect-error
-  const [state, setState] = useImmer<AppState>({})
+  const [
+    state,
+    // @ts-expect-error
+    setState,
+  ] = useImmer<AppState>({ tick: 0 })
   return (
     <AppContext value={state}>
       <Resource />
