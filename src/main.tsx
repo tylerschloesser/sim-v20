@@ -10,6 +10,7 @@ import { createRoot } from 'react-dom/client'
 import invariant from 'tiny-invariant'
 import './index.css'
 import { PointerController } from './pointer-controller'
+import { Vec2 } from './vec2'
 
 const container = document.getElementById('root')
 invariant(container)
@@ -21,7 +22,12 @@ createRoot(container).render(
 )
 
 function App() {
+  return <Rect />
+}
+
+function Rect() {
   const container = useRef<HTMLDivElement>(null)
+  const position = useRef<Vec2>(Vec2.ZERO)
 
   useEffect(() => {
     invariant(container.current)
@@ -34,7 +40,10 @@ function App() {
         pointerId: ev.pointerId,
         container: container.current,
         onDrag: (drag) => {
-          console.log('drag', drag)
+          invariant(container.current)
+          position.current = position.current.add(drag)
+          const { x, y } = position.current
+          container.current.style.transform = `translate(${x}px, ${y}px)`
         },
       })
     }, [])
