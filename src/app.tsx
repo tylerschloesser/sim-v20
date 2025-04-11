@@ -107,6 +107,8 @@ function Rect() {
     useCallback((ev) => {
       invariant(container.current)
       setDown(true)
+      document.body.classList.add('cursor-pointer')
+      document.body.classList.add('select-none')
       new PointerController({
         pointerId: ev.pointerId,
         container: container.current,
@@ -115,9 +117,6 @@ function Rect() {
           position.current = position.current.add(drag)
           const { x, y } = position.current
           container.current.style.transform = `translate(${x}px, ${y}px)`
-
-          document.body.classList.add('cursor-pointer')
-          document.body.classList.add('select-none')
         },
         onComplete: () => {
           setDown(false)
