@@ -33,6 +33,9 @@ function App() {
       new PointerController({
         pointerId: ev.pointerId,
         container: container.current,
+        onDrag: (drag) => {
+          console.log('drag', drag)
+        },
       })
     }, [])
 
