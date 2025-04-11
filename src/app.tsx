@@ -15,6 +15,7 @@ import {
   shareReplay,
 } from 'rxjs'
 import invariant from 'tiny-invariant'
+import { useImmer } from 'use-immer'
 import './index.css'
 import { PointerController } from './pointer-controller'
 import { Vec2 } from './vec2'
@@ -23,11 +24,15 @@ const viewport$ = new BehaviorSubject<Vec2>(
   new Vec2(window.innerWidth, window.innerHeight),
 )
 
-const AppContext = createContext(null)
+interface AppState {}
+
+const AppContext = createContext({})
 
 export function App() {
+  // @ts-expect-error
+  const [state, setState] = useImmer<AppState>({})
   return (
-    <AppContext value={null}>
+    <AppContext value={state}>
       <Resource />
       <div
         className={clsx('absolute', 'pointer-events-none')}
