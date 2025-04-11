@@ -50,6 +50,7 @@ export function App() {
         className={clsx(
           'absolute',
           'bottom-0 right-0',
+          'pointer-events-none select-none',
           'p-1',
           'font-mono text-xs opacity-50',
         )}
