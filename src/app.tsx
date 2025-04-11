@@ -8,13 +8,7 @@ import {
   useRef,
   useState,
 } from 'react'
-import {
-  BehaviorSubject,
-  combineLatest,
-  distinctUntilChanged,
-  map,
-  shareReplay,
-} from 'rxjs'
+import { BehaviorSubject } from 'rxjs'
 import invariant from 'tiny-invariant'
 import { Updater, useImmer } from 'use-immer'
 import './index.css'
@@ -142,43 +136,8 @@ function EntityComponent({ entity }: EntityComponentProps) {
     [setState],
   )
 
-  const container = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    invariant(container.current)
-    const rect$ = new BehaviorSubject<DOMRectReadOnly>(
-      container.current.getBoundingClientRect(),
-    )
-    const resizeObserver = new ResizeObserver((entries) => {
-      invariant(entries.length === 1)
-      const entry = entries.at(0)
-      invariant(entry)
-      rect$.next(entry.contentRect)
-    })
-    resizeObserver.observe(container.current)
-    const size$ = rect$.pipe(
-      map((rect) => new Vec2(rect.width, rect.height)),
-      distinctUntilChanged(),
-      shareReplay(1),
-    )
-
-    combineLatest([viewport$, size$]).subscribe(
-      ([viewport, size]) => {
-        invariant(container.current)
-        const { x, y } = viewport.div(2).sub(size.div(2))
-        // prettier-ignore
-        container.current.style.transform = `translate(${x}px, ${y}px)`
-      },
-    )
-
-    return () => {
-      resizeObserver.disconnect()
-      rect$.complete() // TODO what is this?
-    }
-  }, [])
-
   return (
     <div
-      ref={container}
       onPointerOver={() => {
         setOver(true)
       }}
