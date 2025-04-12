@@ -16,6 +16,7 @@ export interface NodeEntity extends EntityBase {
 
 export interface UndiscoveredEntity extends EntityBase {
   type: 'undiscovered'
+  ticksRemaining: number
 }
 
 export type Entity =
