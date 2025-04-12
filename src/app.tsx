@@ -37,7 +37,10 @@ export function App() {
   }, [])
 
   return (
-    <div className={clsx('w-dvw h-dvh')} ref={container}>
+    <div
+      className={clsx('w-dvw h-dvh relative')}
+      ref={container}
+    >
       <AppContext.Provider
         value={useMemo(
           () => ({
@@ -83,14 +86,18 @@ export function WorldComponent() {
   }, [state.player.position, state.scale, state.spread])
 
   return (
-    <div className={clsx('absolute')} style={style}>
-      <PlayerComponent />
-      {entityIds.map((entityId) => (
-        <EntityComponent
-          key={entityId}
-          entityId={entityId}
-        />
-      ))}
+    <div
+      className={clsx('absolute inset-0 overflow-hidden')}
+    >
+      <div className={clsx('absolute')} style={style}>
+        <PlayerComponent />
+        {entityIds.map((entityId) => (
+          <EntityComponent
+            key={entityId}
+            entityId={entityId}
+          />
+        ))}
+      </div>
     </div>
   )
 }

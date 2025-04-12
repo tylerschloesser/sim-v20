@@ -2,7 +2,11 @@ import clsx from 'clsx'
 import React, { useContext } from 'react'
 import invariant from 'tiny-invariant'
 import { AppContext } from './app-context'
-import { RootEntity, UndiscoveredEntity } from './types'
+import {
+  NodeEntity,
+  RootEntity,
+  UndiscoveredEntity,
+} from './types'
 import { useEntityStyle } from './use-entity-style'
 import { formatSeconds, ticksToSeconds } from './util'
 
@@ -25,13 +29,15 @@ export function EntityComponent({
       body = <RootEntityComponentBody entity={entity} />
       break
     }
+    case 'node': {
+      body = <NodeEntityComponentBody entity={entity} />
+      break
+    }
     case 'undiscovered':
       body = (
         <UndiscoveredEntityComponentBody entity={entity} />
       )
       break
-    default:
-      body = <>{entity.type}</>
   }
 
   return (
@@ -84,6 +90,25 @@ function RootEntityComponentBody({
         'p-1',
         'flex justify-center items-center',
         'bg-green-400',
+      )}
+    >
+      {entity.type}
+    </div>
+  )
+}
+
+interface NodeEntityComponentBodyProps {
+  entity: NodeEntity
+}
+function NodeEntityComponentBody({
+  entity,
+}: NodeEntityComponentBodyProps) {
+  return (
+    <div
+      className={clsx(
+        'w-full h-full',
+        'p-1',
+        'flex justify-center items-center',
       )}
     >
       {entity.type}
