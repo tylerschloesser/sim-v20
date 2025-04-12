@@ -133,6 +133,51 @@ export function App() {
     [state, setState],
   )
 
+  useEffect(() => {
+    const abortController = new AbortController()
+    const { signal } = abortController
+    window.addEventListener(
+      'keydown',
+      (ev) => {
+        let delta: Vec2 | null = null
+        switch (ev.code) {
+          case 'KeyW': {
+            delta = new Vec2(0, -1)
+            break
+          }
+          case 'KeyA': {
+            delta = new Vec2(-1, 0)
+            break
+          }
+          case 'KeyS': {
+            delta = new Vec2(0, 1)
+            break
+          }
+          case 'KeyD': {
+            delta = new Vec2(1, 0)
+            break
+          }
+        }
+        if (delta) {
+          setState((draft) => {
+            const targetEntityId = entityPositionToId(
+              draft.player.position.add(delta),
+            )
+            const targetEntity =
+              draft.entities[targetEntityId]
+            if (targetEntity) {
+              draft.player.position = targetEntity.position
+            }
+          })
+        }
+      },
+      { signal },
+    )
+    return () => {
+      abortController.abort()
+    }
+  }, [])
+
   return (
     <div className={clsx('w-dvw h-dvh')} ref={container}>
       <AppContext.Provider value={context}>
@@ -158,23 +203,33 @@ export function WorldComponent() {
   )
 }
 
+function useStyle(
+  state: AppState,
+  entity: { position: Vec2; size: Vec2 },
+): React.CSSProperties {
+  const translate = useMemo(
+    () =>
+      entity.position
+        .mul(state.scale * state.spread)
+        .add(state.viewport.div(2))
+        .sub(entity.size.mul(state.scale / 2)),
+    [entity, state.scale, state.spread, state.viewport],
+  )
+  return useMemo(
+    () => ({
+      translate: `${translate.x}px ${translate.y}px`,
+      width: `${entity.size.x * state.scale}px`,
+      height: `${entity.size.y * state.scale}px`,
+    }),
+    [translate, entity.size, state.scale],
+  )
+}
+
 export function PlayerComponent() {
   const { state } = useContext(AppContext)
-
-  const translate = state.player.position
-    .sub(state.player.size.div(2))
-    .mul(state.scale)
-    .add(state.viewport.div(2))
-
+  const style = useStyle(state, state.player)
   return (
-    <div
-      className={clsx('absolute')}
-      style={{
-        translate: `${translate.x}px ${translate.y}px`,
-        width: `${state.player.size.x * state.scale}px`,
-        height: `${state.player.size.y * state.scale}px`,
-      }}
-    >
+    <div className={clsx('absolute')} style={style}>
       <div
         className={clsx(
           'absolute inset-0',
@@ -199,19 +254,12 @@ export function EntityComponent({
   const entity = state.entities[entityId]
   invariant(entity)
 
-  const translate = entity.position
-    .mul(state.scale * state.spread)
-    .add(state.viewport.div(2))
-    .sub(state.scale / 2)
+  const style = useStyle(state, entity)
 
   return (
     <div
       className={clsx('absolute', 'border-2 border-black')}
-      style={{
-        translate: `${translate.x}px ${translate.y}px`,
-        width: `${entity.size.x * state.scale}px`,
-        height: `${entity.size.y * state.scale}px`,
-      }}
+      style={style}
     >
       {entity.type}
     </div>
