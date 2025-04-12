@@ -77,6 +77,13 @@ const world$ = new BehaviorSubject<World>(initWorld())
 const viewport$ = new BehaviorSubject<Vec2>(
   new Vec2(window.innerWidth, window.innerHeight),
 )
+
+window.addEventListener('resize', () => {
+  viewport$.next(
+    new Vec2(window.innerWidth, window.innerHeight),
+  )
+})
+
 const boundingBox$ = world$.pipe(
   map((world) => {
     let tl = new Vec2(Number.MAX_SAFE_INTEGER)
@@ -91,20 +98,8 @@ const boundingBox$ = world$.pipe(
   distinctUntilChanged(isEqual),
 )
 
-const transform$ = combineLatest([
-  viewport$,
-  boundingBox$,
-]).pipe(
-  map(([viewport, boundingBox]) => {
-    const scale = Math.min(
-      viewport.x / boundingBox.size.x,
-      viewport.y / boundingBox.size.y,
-    )
-    return {
-      translate: Vec2.ZERO,
-      scale,
-    }
-  }),
+const padding$ = new BehaviorSubject<Vec2>(
+  new Vec2(0.5, 0.5),
 )
 
 export function App() {
@@ -146,6 +141,45 @@ function EntityComponentGrid() {
   const world = useStateObservable(world$)
   const ref = useRef<HTMLDivElement>(null)
 
+  useEffectWithDestroy((destroy$) => {
+    combineLatest([viewport$, boundingBox$, padding$])
+      .pipe(takeUntil(destroy$))
+      .subscribe(([viewport, boundingBox, padding]) => {
+        const size = boundingBox.size.add(padding.mul(2))
+
+        const viewportRatio = viewport.x / viewport.y
+        const boundingBoxRatio = size.x / size.y
+
+        const scale = Math.min(
+          viewport.x / size.x,
+          viewport.y / size.y,
+        )
+
+        let offset: Vec2
+        if (viewportRatio > boundingBoxRatio) {
+          offset = new Vec2(
+            (viewport.x / scale - size.x) / 2,
+            0,
+          )
+        } else {
+          offset = new Vec2(
+            0,
+            (viewport.y / scale - size.y) / 2,
+          )
+        }
+
+        invariant(ref.current)
+        // prettier-ignore
+        {
+          ref.current.style.setProperty('--padding-x', `${padding.x}px`)
+          ref.current.style.setProperty('--padding-y', `${padding.y}px`)
+          ref.current.style.setProperty('--offset-x', `${offset.x}px`)
+          ref.current.style.setProperty('--offset-y', `${offset.y}px`)
+          ref.current.style.setProperty('--scale', `${scale}`)
+        }
+      })
+  }, [])
+
   return (
     <div
       ref={ref}
@@ -165,38 +199,27 @@ interface EntityComponentProps {
 function EntityComponent({ entity }: EntityComponentProps) {
   const ref = useRef<HTMLDivElement>(null)
 
-  useEffectWithDestroy(
-    (destroy$) => {
-      transform$
-        .pipe(takeUntil(destroy$))
-        .subscribe(({ translate, scale }) => {
-          invariant(ref.current)
-          const { x, y } = entity.position
-            .add(translate)
-            .mul(scale)
-          console.log(x, y)
-          ref.current.style.translate = `${x}px ${y}px`
-        })
-    },
-    [entity.position],
-  )
-
-  useEffectWithDestroy(
-    (destroy$) => {
-      transform$
-        .pipe(takeUntil(destroy$))
-        .subscribe(({ scale }) => {
-          invariant(ref.current)
-          ref.current.style.width = `${entity.size.x * scale}px`
-          ref.current.style.height = `${entity.size.y * scale}px`
-        })
-    },
-    [entity.size],
-  )
-
   return (
     <div
       ref={ref}
+      data-position-x={entity.position.x}
+      data-position-y={entity.position.y}
+      data-size-x={entity.size.x}
+      data-size-y={entity.size.y}
+      style={
+        {
+          '--position-x': `${entity.position.x}px`,
+          '--position-y': `${entity.position.y}px`,
+          '--size-x': `${entity.size.x}px`,
+          '--size-y': `${entity.size.y}px`,
+          translate: [
+            'calc((var(--position-x) + var(--offset-x) + var(--padding-x)) * var(--scale))',
+            'calc((var(--position-y) + var(--offset-y) + var(--padding-y)) * var(--scale))',
+          ].join(' '),
+          width: `calc(var(--size-x) * var(--scale))`,
+          height: `calc(var(--size-y) * var(--scale))`,
+        } as React.CSSProperties
+      }
       className={clsx(
         'absolute',
         'border-2 border-black bg-red-300',
