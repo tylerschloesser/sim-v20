@@ -154,9 +154,14 @@ export function EntityComponent({
 
   return (
     <div
-      className={clsx('absolute', 'border-2 border-black', {
-        'opacity-20': entity.type === 'undiscovered',
-      })}
+      className={clsx(
+        'absolute',
+        'border-2 border-black',
+        'overflow-hidden',
+        {
+          'opacity-20': entity.type === 'undiscovered',
+        },
+      )}
       style={style}
     >
       {entity.type}
