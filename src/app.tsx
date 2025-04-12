@@ -190,8 +190,13 @@ export function App() {
 export function WorldComponent() {
   const { state } = useContext(AppContext)
   const entityIds = Object.keys(state.entities)
+
+  const style = useMemo<React.CSSProperties>(() => {
+    return {}
+  }, [])
+
   return (
-    <div>
+    <div className={clsx('absolute')} style={style}>
       <PlayerComponent />
       {entityIds.map((entityId) => (
         <EntityComponent
