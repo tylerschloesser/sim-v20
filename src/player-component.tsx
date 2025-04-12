@@ -1,11 +1,17 @@
 import clsx from 'clsx'
 import { useContext } from 'react'
+import invariant from 'tiny-invariant'
 import { AppContext } from './app-context'
+import { MAX_PLAYER_ENERGY } from './const'
 import { useEntityStyle } from './use-entity-style'
 
 export function PlayerComponent() {
   const { state } = useContext(AppContext)
   const style = useEntityStyle(state, state.player)
+
+  invariant(state.player.energy <= MAX_PLAYER_ENERGY)
+  invariant(state.player.energy >= 0)
+
   return (
     <div className={clsx('absolute')} style={style}>
       <div
@@ -32,12 +38,22 @@ export function PlayerComponent() {
       >
         <div
           className={clsx(
-            'flex-1',
+            'flex-1 relative',
             'w-4',
-            'bg-green-400',
             'border-2 border-black',
           )}
-        ></div>
+        >
+          <div
+            className={clsx(
+              'absolute inset-0',
+              'bg-green-400',
+              'origin-bottom',
+            )}
+            style={{
+              scale: `1 ${Math.floor((state.player.energy / MAX_PLAYER_ENERGY) * 100)}%`,
+            }}
+          />
+        </div>
       </div>
     </div>
   )
