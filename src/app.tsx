@@ -184,13 +184,13 @@ export function EntityComponent({
   )
 }
 
-interface UndiscoveredEntityComponentProps {
+interface UndiscoveredEntityComponentBodyProps {
   entity: UndiscoveredEntity
 }
 // @ts-expect-error
 function UndiscoveredEntityComponentBody({
   entity,
-}: UndiscoveredEntityComponentProps) {
+}: UndiscoveredEntityComponentBodyProps) {
   return <>TODO</>
 }
 
