@@ -37,17 +37,17 @@ export function App() {
     }
   }, [])
 
-  const context = useMemo(
-    () => ({
-      state,
-      setState,
-    }),
-    [state, setState],
-  )
-
   return (
     <div className={clsx('w-dvw h-dvh')} ref={container}>
-      <AppContext.Provider value={context}>
+      <AppContext.Provider
+        value={useMemo(
+          () => ({
+            state,
+            setState,
+          }),
+          [state, setState],
+        )}
+      >
         <WorldComponent />
         <TickComponent />
       </AppContext.Provider>

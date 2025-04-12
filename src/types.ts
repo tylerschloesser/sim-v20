@@ -14,7 +14,14 @@ export interface NodeEntity extends EntityBase {
   type: 'node'
 }
 
-export type Entity = RootEntity | NodeEntity
+export interface UndiscoveredEntity extends EntityBase {
+  type: 'undiscovered'
+}
+
+export type Entity =
+  | RootEntity
+  | NodeEntity
+  | UndiscoveredEntity
 
 export interface Player {
   position: Vec2
@@ -29,3 +36,5 @@ export interface AppState {
   spread: number
   entities: Record<string, Entity>
 }
+
+export type Direction = 'up' | 'down' | 'left' | 'right'
