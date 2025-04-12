@@ -10,16 +10,12 @@ import invariant from 'tiny-invariant'
 import { Updater, useImmer } from 'use-immer'
 import { AppContext } from './app-context'
 import { TICK_DURATION } from './const'
+import { EntityComponent } from './entity-component'
 import { initState } from './init-state'
 import { PlayerComponent } from './player-component'
 import { tickState } from './tick-state'
-import {
-  AppState,
-  Direction,
-  UndiscoveredEntity,
-} from './types'
-import { useEntityStyle } from './use-entity-style'
-import { formatSeconds, move, ticksToSeconds } from './util'
+import { AppState, Direction } from './types'
+import { move } from './util'
 import { Vec2 } from './vec2'
 
 export function App() {
@@ -95,67 +91,6 @@ export function WorldComponent() {
           entityId={entityId}
         />
       ))}
-    </div>
-  )
-}
-
-interface EntityComponentProps {
-  entityId: string
-}
-
-export function EntityComponent({
-  entityId,
-}: EntityComponentProps) {
-  const { state } = useContext(AppContext)
-  const entity = state.entities[entityId]
-  invariant(entity)
-
-  const style = useEntityStyle(state, entity)
-
-  let body: React.ReactNode
-  switch (entity.type) {
-    case 'undiscovered':
-      body = (
-        <UndiscoveredEntityComponentBody entity={entity} />
-      )
-      break
-    default:
-      body = <>{entity.type}</>
-  }
-
-  return (
-    <div
-      className={clsx(
-        'absolute',
-        'border-2 border-black',
-        'overflow-hidden',
-        {
-          'opacity-20': entity.type === 'undiscovered',
-        },
-      )}
-      style={style}
-    >
-      {body}
-    </div>
-  )
-}
-
-interface UndiscoveredEntityComponentBodyProps {
-  entity: UndiscoveredEntity
-}
-function UndiscoveredEntityComponentBody({
-  entity,
-}: UndiscoveredEntityComponentBodyProps) {
-  const seconds = ticksToSeconds(entity.ticksRemaining)
-  return (
-    <div
-      className={clsx(
-        'w-full h-full',
-        'p-1',
-        'flex justify-center items-center',
-      )}
-    >
-      {formatSeconds(seconds)}
     </div>
   )
 }
