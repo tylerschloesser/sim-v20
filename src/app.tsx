@@ -128,7 +128,7 @@ export function App() {
             'pointer-events-none',
           )}
         >
-          <Rect />
+          <PlayerComponent />
         </div>
       </AppContext>
     </Subscribe>
@@ -229,7 +229,7 @@ function EntityComponent({ entity }: EntityComponentProps) {
   )
 }
 
-function Rect() {
+function PlayerComponent() {
   const container = useRef<HTMLDivElement>(null)
   const position = useRef<Vec2>(Vec2.ZERO)
   const [down, setDown] = useState(false)
