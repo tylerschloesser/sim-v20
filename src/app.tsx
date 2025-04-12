@@ -26,6 +26,17 @@ export function App() {
   useViewport(container, setState)
   useKeyboard(setState)
 
+  useEffect(() => {
+    const interval = self.setInterval(() => {
+      setState((draft) => {
+        draft.tick += 1
+      })
+    }, 100)
+    return () => {
+      self.clearInterval(interval)
+    }
+  }, [])
+
   const context = useMemo(
     () => ({
       state,
@@ -38,7 +49,23 @@ export function App() {
     <div className={clsx('w-dvw h-dvh')} ref={container}>
       <AppContext.Provider value={context}>
         <WorldComponent />
+        <TickComponent />
       </AppContext.Provider>
+    </div>
+  )
+}
+
+function TickComponent() {
+  const { state } = useContext(AppContext)
+  return (
+    <div
+      className={clsx(
+        'absolute top-0 left-0',
+        'p-1',
+        'text-xs font-mono opacity-50',
+      )}
+    >
+      {state.tick}
     </div>
   )
 }
