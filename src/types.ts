@@ -23,6 +23,7 @@ export interface Player {
 
 export interface AppState {
   viewport: Vec2
+  tick: number
   player: Player
   scale: number
   spread: number

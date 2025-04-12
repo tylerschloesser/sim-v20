@@ -23,29 +23,7 @@ export function App() {
   const container = useRef<HTMLDivElement>(null)
   const [state, setState] = useImmer<AppState>(initState)
 
-  useEffect(() => {
-    invariant(container.current)
-    const resizeObserver = new ResizeObserver((entries) => {
-      invariant(entries.length === 1)
-      const entry = entries.at(0)
-      invariant(entry)
-      setState((draft) => {
-        draft.viewport = new Vec2(
-          entry.contentRect.width,
-          entry.contentRect.height,
-        )
-        draft.scale =
-          Math.min(
-            entry.contentRect.width,
-            entry.contentRect.height,
-          ) * 0.1
-      })
-    })
-    resizeObserver.observe(container.current)
-    return () => {
-      resizeObserver.disconnect()
-    }
-  }, [setState])
+  useResize(container, setState)
 
   const context = useMemo(
     () => ({
@@ -196,4 +174,33 @@ export function EntityComponent({
       {entity.type}
     </div>
   )
+}
+
+function useResize(
+  container: React.RefObject<HTMLDivElement | null>,
+  setState: Updater<AppState>,
+) {
+  useEffect(() => {
+    invariant(container.current)
+    const resizeObserver = new ResizeObserver((entries) => {
+      invariant(entries.length === 1)
+      const entry = entries.at(0)
+      invariant(entry)
+      setState((draft) => {
+        draft.viewport = new Vec2(
+          entry.contentRect.width,
+          entry.contentRect.height,
+        )
+        draft.scale =
+          Math.min(
+            entry.contentRect.width,
+            entry.contentRect.height,
+          ) * 0.1
+      })
+    })
+    resizeObserver.observe(container.current)
+    return () => {
+      resizeObserver.disconnect()
+    }
+  }, [setState])
 }

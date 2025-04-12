@@ -7,12 +7,13 @@ import { Vec2 } from './vec2'
 export function initState(): AppState {
   const state: AppState = {
     viewport: Vec2.ZERO,
+    tick: 0,
     player: {
       position: Vec2.ZERO,
       size: new Vec2(1.5),
     },
     scale: 1,
-    spread: 2,
+    spread: 3,
     entities: {},
   }
 
