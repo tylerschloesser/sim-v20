@@ -12,16 +12,19 @@ export interface RootEntity extends EntityBase {
 
 export interface NodeEntity extends EntityBase {
   type: 'node'
+  action: 'mine' | null
   mineTicksRemaining: number
 }
 
 export interface UndiscoveredEntity extends EntityBase {
   type: 'undiscovered'
+  action: 'discover' | null
+  discoverTicksRequired: number
   discoverTicksRemaining: number
 }
 
 export type Item = 'wood' | 'stone' | 'iron' | 'gold'
-export type Action = 'mine'
+export type Action = 'mine' | 'discover'
 
 export type Entity =
   | RootEntity
@@ -35,7 +38,6 @@ export interface Player {
   size: Vec2
   energy: number
   inventory: Inventory
-  action: Action | null
 }
 
 export interface AppState {

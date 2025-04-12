@@ -15,7 +15,6 @@ export function initState(): AppState {
         wood: 10,
         stone: 5,
       },
-      action: null,
     },
     scale: 1,
     spread: SPREAD,

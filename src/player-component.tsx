@@ -3,7 +3,7 @@ import { Fragment, useContext, useMemo } from 'react'
 import invariant from 'tiny-invariant'
 import { AppContext } from './app-context'
 import { MAX_PLAYER_ENERGY, MINE_TICKS } from './const'
-import { Action, Inventory } from './types'
+import { Inventory } from './types'
 import { useEntityStyle } from './use-entity-style'
 import { entityPositionToId } from './util'
 
@@ -102,64 +102,36 @@ function InventoryGrid({ inventory }: InventoryGridProps) {
 function ActionDisplay() {
   const { state } = useContext(AppContext)
 
-  const availableAction = useMemo<Action | null>(() => {
-    const currentEntity =
-      state.entities[
-        entityPositionToId(state.player.position)
-      ]
-    invariant(currentEntity)
-    if (currentEntity.type === 'node') {
-      return 'mine'
-    }
-    return null
-  }, [state.player, state.entities])
-
-  if (state.player.action) {
-    invariant(state.player.action === availableAction)
-  }
-
-  if (availableAction === 'mine') {
-    return <MineActionDisplay />
-  }
-
-  return (
-    <div
-      className={clsx(
-        'absolute top-full left-0 right-0',
-        'pt-2',
-        'text-xs',
-      )}
-    >
-      <div
-        className={clsx(
-          'border-2 border-black p-1',
-          'text-center',
-          {
-            'opacity-50': !availableAction,
-            'bg-blue-400': state.player.action,
-          },
-        )}
-      >
-        {availableAction
-          ? `[${availableAction}]`
-          : '[none]'}
-      </div>
-    </div>
-  )
-}
-
-function MineActionDisplay() {
-  const { state } = useContext(AppContext)
   const currentEntity =
     state.entities[
       entityPositionToId(state.player.position)
     ]
   invariant(currentEntity)
-  invariant(currentEntity.type === 'node')
 
-  const progress = useMemo(() => {
-    return 1 - currentEntity.mineTicksRemaining / MINE_TICKS
-  }, [currentEntity.mineTicksRemaining])
+  const { action, progress } = useMemo(() => {
+    switch (currentEntity.type) {
+      case 'node': {
+        const mineTicksRequired = MINE_TICKS
+        const progress =
+          1 -
+          currentEntity.mineTicksRemaining /
+            mineTicksRequired
+        return { action: 'mine', progress }
+      }
+      case 'undiscovered': {
+        const progress =
+          1 -
+          currentEntity.discoverTicksRemaining /
+            currentEntity.discoverTicksRequired
+        return { action: 'discover', progress }
+      }
+      default: {
+        return { action: null, progress: 0 }
+      }
+    }
+  }, [currentEntity])
+
+  const label = `[${action ?? 'none'}]`
 
   return (
     <div
@@ -184,7 +156,7 @@ function MineActionDisplay() {
             scale: `${progress} 1`,
           }}
         />
-        <div className="relative">[mine]</div>
+        <div className="relative">{label}</div>
       </div>
     </div>
   )

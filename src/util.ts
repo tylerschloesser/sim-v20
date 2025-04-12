@@ -33,10 +33,14 @@ export function addEntity(
 
 export function addNodeEntity(
   state: AppState,
-  partial: Omit<NodeEntity, 'id' | 'mineTicksRemaining'>,
+  partial: Omit<
+    NodeEntity,
+    'id' | 'action' | 'mineTicksRemaining'
+  >,
 ): void {
   addEntity(state, {
     ...partial,
+    action: null,
     mineTicksRemaining: MINE_TICKS,
   })
 }
@@ -49,7 +53,6 @@ export function move(draft: AppState, delta: Vec2): void {
     return
   }
 
-  draft.player.action = null
   draft.player.position = targetPosition
 
   if (targetEntity.type === 'undiscovered') {
@@ -76,7 +79,7 @@ export function onVisitEntity(
     const neighborEntity = draft.entities[neighborId]
 
     if (!neighborEntity) {
-      const ticksRemaining = Math.floor(
+      const discoverTicksRequired = Math.floor(
         (neighborPosition.length() * DISCOVERY_CONSTANT) **
           DISCOVERY_EXPONENT,
       )
@@ -84,7 +87,9 @@ export function onVisitEntity(
         type: 'undiscovered',
         position: neighborPosition,
         size: new Vec2(1, 1),
-        discoverTicksRemaining: ticksRemaining,
+        action: 'discover',
+        discoverTicksRequired,
+        discoverTicksRemaining: discoverTicksRequired,
       })
     }
   }
@@ -101,18 +106,22 @@ export function formatSeconds(seconds: number): string {
 }
 
 export function toggleAction(draft: AppState): void {
-  if (draft.player.action || draft.player.energy === 0) {
-    draft.player.action = null
-    return
-  }
-
   const currentEntityId = entityPositionToId(
     draft.player.position,
   )
   const currentEntity = draft.entities[currentEntityId]
   invariant(currentEntity)
 
-  if (currentEntity.type === 'node') {
-    draft.player.action = 'mine'
+  switch (currentEntity.type) {
+    case 'undiscovered': {
+      currentEntity.action =
+        currentEntity.action === null ? 'discover' : null
+      break
+    }
+    case 'node': {
+      currentEntity.action =
+        currentEntity.action === null ? 'mine' : null
+      break
+    }
   }
 }

@@ -1,4 +1,3 @@
-import { omit } from 'lodash-es'
 import invariant from 'tiny-invariant'
 import {
   MAX_PLAYER_ENERGY,
@@ -30,13 +29,12 @@ export function tickState(draft: AppState): void {
       break
     }
     case 'node': {
-      if (draft.player.action === 'mine') {
-        invariant(draft.player.energy > 0)
+      if (
+        playerEntity.action === 'mine' &&
+        draft.player.energy > 0
+      ) {
         invariant(playerEntity.mineTicksRemaining > 0)
         draft.player.energy -= 1
-        if (draft.player.energy === 0) {
-          draft.player.action = null
-        }
         playerEntity.mineTicksRemaining -= 1
         if (playerEntity.mineTicksRemaining === 0) {
           const item: Item = 'wood'
@@ -48,23 +46,28 @@ export function tickState(draft: AppState): void {
       break
     }
     case 'undiscovered': {
-      if (draft.player.energy === 0) {
-        break
-      }
-      invariant(playerEntity.discoverTicksRemaining > 0)
+      if (
+        playerEntity.action === 'discover' &&
+        draft.player.energy > 0
+      ) {
+        invariant(playerEntity.discoverTicksRemaining > 0)
 
-      playerEntity.discoverTicksRemaining -= 1
-      draft.player.energy -= 1
+        playerEntity.discoverTicksRemaining -= 1
+        draft.player.energy -= 1
 
-      if (playerEntity.discoverTicksRemaining === 0) {
-        const updatedEntity = (draft.entities[
-          playerEntity.id
-        ] = {
-          ...omit(playerEntity, 'discoverTicksRemaining'),
-          type: 'node',
-          mineTicksRemaining: MINE_TICKS,
-        } satisfies NodeEntity)
-        onVisitEntity(draft, updatedEntity)
+        if (playerEntity.discoverTicksRemaining === 0) {
+          const updatedEntity = (draft.entities[
+            playerEntity.id
+          ] = {
+            id: playerEntity.id,
+            position: playerEntity.position,
+            size: playerEntity.size,
+            type: 'node',
+            action: null,
+            mineTicksRemaining: MINE_TICKS,
+          } satisfies NodeEntity)
+          onVisitEntity(draft, updatedEntity)
+        }
       }
       break
     }
