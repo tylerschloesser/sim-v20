@@ -168,13 +168,23 @@ export function PlayerComponent() {
 
   return (
     <div
-      className={clsx('absolute', 'border-2 border-black')}
+      className={clsx('absolute')}
       style={{
         translate: `${translate.x}px ${translate.y}px`,
         width: `${state.player.size.x * state.scale}px`,
         height: `${state.player.size.y * state.scale}px`,
       }}
-    ></div>
+    >
+      <div
+        className={clsx(
+          'absolute inset-0',
+          'border-2 border-black',
+        )}
+      ></div>
+      <div className={clsx('absolute bottom-full')}>
+        Player
+      </div>
+    </div>
   )
 }
 
