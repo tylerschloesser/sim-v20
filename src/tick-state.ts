@@ -1,4 +1,5 @@
 import invariant from 'tiny-invariant'
+import { MAX_PLAYER_ENERGY } from './const'
 import { AppState } from './types'
 import { entityPositionToId, onVisitEntity } from './util'
 
@@ -6,9 +7,6 @@ export function tickState(draft: AppState): void {
   draft.tick += 1
 
   invariant(draft.player.energy >= 0)
-  if (draft.player.energy === 0) {
-    return
-  }
 
   const playerEntity =
     draft.entities[
@@ -17,7 +15,16 @@ export function tickState(draft: AppState): void {
   invariant(playerEntity)
 
   switch (playerEntity.type) {
+    case 'root': {
+      if (draft.player.energy < MAX_PLAYER_ENERGY) {
+        draft.player.energy += 1
+      }
+      break
+    }
     case 'undiscovered': {
+      if (draft.player.energy === 0) {
+        break
+      }
       invariant(playerEntity.ticksRemaining > 0)
 
       playerEntity.ticksRemaining -= 1
