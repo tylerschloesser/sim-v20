@@ -196,7 +196,7 @@ export function WorldComponent() {
       state.scale * state.spread * -1,
     )
     return {
-      translate: `${x}px, ${y}px`,
+      translate: `${x}px ${y}px`,
     }
   }, [state.player.position, state.scale, state.spread])
 
