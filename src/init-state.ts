@@ -11,7 +11,10 @@ export function initState(): AppState {
       position: Vec2.ZERO,
       size: new Vec2(1.5),
       energy: MAX_PLAYER_ENERGY,
-      inventory: {},
+      inventory: {
+        wood: 10,
+        stone: 5,
+      },
       action: null,
     },
     scale: 1,

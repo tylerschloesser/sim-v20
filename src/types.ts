@@ -27,11 +27,13 @@ export type Entity =
   | NodeEntity
   | UndiscoveredEntity
 
+export type Inventory = Partial<Record<Item, number>>
+
 export interface Player {
   position: Vec2
   size: Vec2
   energy: number
-  inventory: Partial<Record<Item, number>>
+  inventory: Inventory
   action: Action | null
 }
 

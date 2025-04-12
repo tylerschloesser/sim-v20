@@ -1,8 +1,9 @@
 import clsx from 'clsx'
-import { useContext } from 'react'
+import { Fragment, useContext } from 'react'
 import invariant from 'tiny-invariant'
 import { AppContext } from './app-context'
 import { MAX_PLAYER_ENERGY } from './const'
+import { Inventory } from './types'
 import { useEntityStyle } from './use-entity-style'
 
 export function PlayerComponent() {
@@ -29,6 +30,7 @@ export function PlayerComponent() {
         Player
       </div>
       <EnergyBar energy={state.player.energy} />
+      <InventoryGrid inventory={state.player.inventory} />
     </div>
   )
 }
@@ -64,6 +66,29 @@ function EnergyBar({ energy }: EnergyBarProps) {
             scale: `1 ${Math.floor((energy / MAX_PLAYER_ENERGY) * 100)}%`,
           }}
         />
+      </div>
+    </div>
+  )
+}
+
+interface InventoryGridProps {
+  inventory: Inventory
+}
+
+function InventoryGrid({ inventory }: InventoryGridProps) {
+  return (
+    <div
+      className={clsx('absolute left-full top-0', 'pl-2')}
+    >
+      <div
+        className={clsx('grid grid-cols-[1fr_1fr] gap-1')}
+      >
+        {Object.entries(inventory).map(([item, count]) => (
+          <Fragment key={item}>
+            <div>{item}</div>
+            <div>{count}</div>
+          </Fragment>
+        ))}
       </div>
     </div>
   )
