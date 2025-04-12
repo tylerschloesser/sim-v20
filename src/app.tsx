@@ -166,9 +166,7 @@ export function PlayerComponent() {
         width: `${state.scale}px`,
         height: `${state.scale}px`,
       }}
-    >
-      {state.player.toString()}
-    </div>
+    ></div>
   )
 }
 
@@ -190,7 +188,7 @@ export function EntityComponent({
 
   return (
     <div
-      className={clsx('absolute')}
+      className={clsx('absolute', 'border-2 border-black')}
       style={{
         translate: `${translate.x}px ${translate.y}px`,
         width: `${entity.size.x * state.scale}px`,
