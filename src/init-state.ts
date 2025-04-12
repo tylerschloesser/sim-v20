@@ -1,3 +1,4 @@
+import { SPREAD } from './const'
 import { AppState } from './types'
 import { addEntity } from './util'
 import { Vec2 } from './vec2'
@@ -11,7 +12,7 @@ export function initState(): AppState {
       size: new Vec2(1.5),
     },
     scale: 1,
-    spread: 3,
+    spread: SPREAD,
     entities: {},
   }
 

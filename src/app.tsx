@@ -8,6 +8,7 @@ import React, {
 } from 'react'
 import invariant from 'tiny-invariant'
 import { Updater, useImmer } from 'use-immer'
+import { TICK_DURATION } from './const'
 import './index.css'
 import { initState } from './init-state'
 import {
@@ -38,7 +39,7 @@ export function App() {
       setState((draft) => {
         draft.tick += 1
       })
-    }, 100)
+    }, TICK_DURATION)
     return () => {
       self.clearInterval(interval)
     }
