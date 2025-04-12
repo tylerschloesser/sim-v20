@@ -28,32 +28,42 @@ export function PlayerComponent() {
       >
         Player
       </div>
+      <EnergyBar energy={state.player.energy} />
+    </div>
+  )
+}
+
+interface EnergyBarProps {
+  energy: number
+}
+
+function EnergyBar({ energy }: EnergyBarProps) {
+  return (
+    <div
+      className={clsx(
+        'absolute right-full top-0 bottom-0',
+        'pr-2',
+        'flex flex-row',
+        'text-xs',
+      )}
+    >
       <div
         className={clsx(
-          'absolute right-full top-0 bottom-0',
-          'pr-2',
-          'flex flex-row',
-          'text-xs',
+          'flex-1 relative',
+          'w-4',
+          'border-2 border-black',
         )}
       >
         <div
           className={clsx(
-            'flex-1 relative',
-            'w-4',
-            'border-2 border-black',
+            'absolute inset-0',
+            'bg-green-400',
+            'origin-bottom',
           )}
-        >
-          <div
-            className={clsx(
-              'absolute inset-0',
-              'bg-green-400',
-              'origin-bottom',
-            )}
-            style={{
-              scale: `1 ${Math.floor((state.player.energy / MAX_PLAYER_ENERGY) * 100)}%`,
-            }}
-          />
-        </div>
+          style={{
+            scale: `1 ${Math.floor((energy / MAX_PLAYER_ENERGY) * 100)}%`,
+          }}
+        />
       </div>
     </div>
   )
