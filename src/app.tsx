@@ -12,12 +12,14 @@ import { AppContext } from './app-context'
 import { TICK_DURATION } from './const'
 import './index.css'
 import { initState } from './init-state'
+import { PlayerComponent } from './player-component'
 import { tickState } from './tick-state'
 import {
   AppState,
   Direction,
   UndiscoveredEntity,
 } from './types'
+import { useEntityStyle } from './use-entity-style'
 import { formatSeconds, move, ticksToSeconds } from './util'
 import { Vec2 } from './vec2'
 
@@ -98,46 +100,6 @@ export function WorldComponent() {
   )
 }
 
-function useStyle(
-  state: AppState,
-  entity: { position: Vec2; size: Vec2 },
-): React.CSSProperties {
-  const translate = useMemo(
-    () =>
-      entity.position
-        .mul(state.scale * state.spread)
-        .add(state.viewport.div(2))
-        .sub(entity.size.mul(state.scale / 2)),
-    [entity, state.scale, state.spread, state.viewport],
-  )
-  return useMemo(
-    () => ({
-      translate: `${translate.x}px ${translate.y}px`,
-      width: `${entity.size.x * state.scale}px`,
-      height: `${entity.size.y * state.scale}px`,
-    }),
-    [translate, entity.size, state.scale],
-  )
-}
-
-export function PlayerComponent() {
-  const { state } = useContext(AppContext)
-  const style = useStyle(state, state.player)
-  return (
-    <div className={clsx('absolute')} style={style}>
-      <div
-        className={clsx(
-          'absolute inset-0',
-          'border-2 border-black',
-        )}
-      ></div>
-      <div className={clsx('absolute bottom-full')}>
-        Player
-      </div>
-    </div>
-  )
-}
-
 interface EntityComponentProps {
   entityId: string
 }
@@ -149,7 +111,7 @@ export function EntityComponent({
   const entity = state.entities[entityId]
   invariant(entity)
 
-  const style = useStyle(state, entity)
+  const style = useEntityStyle(state, entity)
 
   let body: React.ReactNode
   switch (entity.type) {
