@@ -40,21 +40,29 @@ export function move(draft: AppState, delta: Vec2): void {
     return
   }
 
+  if (targetEntity.type === 'node') {
+    onVisitEntity(draft, targetEntity)
+  }
+}
+
+export function onVisitEntity(
+  draft: AppState,
+  entity: NodeEntity,
+): void {
   for (const delta of [
     new Vec2(0, 1),
     new Vec2(1, 0),
     new Vec2(0, -1),
     new Vec2(-1, 0),
   ]) {
-    const neighborPosition = targetPosition.add(delta)
+    const neighborPosition = entity.position.add(delta)
     const neighborId = entityPositionToId(neighborPosition)
     const neighborEntity = draft.entities[neighborId]
 
-    const ticksRemaining = Math.floor(
-      (neighborPosition.length() * 10) ** 2,
-    )
-
     if (!neighborEntity) {
+      const ticksRemaining = Math.floor(
+        (neighborPosition.length() * 10) ** 2,
+      )
       addEntity(draft, {
         type: 'undiscovered',
         position: neighborPosition,
