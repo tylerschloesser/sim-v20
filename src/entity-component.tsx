@@ -63,7 +63,9 @@ interface UndiscoveredEntityComponentBodyProps {
 function UndiscoveredEntityComponentBody({
   entity,
 }: UndiscoveredEntityComponentBodyProps) {
-  const seconds = ticksToSeconds(entity.ticksRemaining)
+  const seconds = ticksToSeconds(
+    entity.discoverTicksRemaining,
+  )
   return (
     <div
       className={clsx(

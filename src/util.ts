@@ -3,6 +3,7 @@ import invariant from 'tiny-invariant'
 import {
   DISCOVERY_CONSTANT,
   DISCOVERY_EXPONENT,
+  MINE_TICKS,
 } from './const'
 import {
   AppState,
@@ -28,6 +29,16 @@ export function addEntity(
   const id = entityPositionToId(partial.position)
   invariant(!state.entities[id])
   state.entities[id] = { ...partial, id }
+}
+
+export function addNodeEntity(
+  state: AppState,
+  partial: Omit<NodeEntity, 'id' | 'mineTicksRemaining'>,
+): void {
+  addEntity(state, {
+    ...partial,
+    mineTicksRemaining: MINE_TICKS,
+  })
 }
 
 export function move(draft: AppState, delta: Vec2): void {
@@ -73,7 +84,7 @@ export function onVisitEntity(
         type: 'undiscovered',
         position: neighborPosition,
         size: new Vec2(1, 1),
-        ticksRemaining,
+        discoverTicksRemaining: ticksRemaining,
       })
     }
   }

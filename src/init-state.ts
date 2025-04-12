@@ -1,6 +1,6 @@
 import { MAX_PLAYER_ENERGY, SPREAD } from './const'
 import { AppState } from './types'
-import { addEntity } from './util'
+import { addEntity, addNodeEntity } from './util'
 import { Vec2 } from './vec2'
 
 export function initState(): AppState {
@@ -27,22 +27,22 @@ export function initState(): AppState {
     position: Vec2.ZERO,
     size: new Vec2(1, 1),
   })
-  addEntity(state, {
+  addNodeEntity(state, {
     type: 'node',
     position: new Vec2(1, 0),
     size: new Vec2(1, 1),
   })
-  addEntity(state, {
+  addNodeEntity(state, {
     type: 'node',
     position: new Vec2(0, 1),
     size: new Vec2(1, 1),
   })
-  addEntity(state, {
+  addNodeEntity(state, {
     type: 'node',
     position: new Vec2(-1, 0),
     size: new Vec2(1, 1),
   })
-  addEntity(state, {
+  addNodeEntity(state, {
     type: 'node',
     position: new Vec2(0, -1),
     size: new Vec2(1, 1),

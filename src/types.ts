@@ -12,11 +12,12 @@ export interface RootEntity extends EntityBase {
 
 export interface NodeEntity extends EntityBase {
   type: 'node'
+  mineTicksRemaining: number
 }
 
 export interface UndiscoveredEntity extends EntityBase {
   type: 'undiscovered'
-  ticksRemaining: number
+  discoverTicksRemaining: number
 }
 
 export type Item = 'wood' | 'stone' | 'iron' | 'gold'

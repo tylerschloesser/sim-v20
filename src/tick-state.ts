@@ -1,6 +1,7 @@
 import invariant from 'tiny-invariant'
 import {
   MAX_PLAYER_ENERGY,
+  MINE_TICKS,
   ROOT_ENERGY_RECOVERY,
 } from './const'
 import { AppState } from './types'
@@ -31,17 +32,18 @@ export function tickState(draft: AppState): void {
       if (draft.player.energy === 0) {
         break
       }
-      invariant(playerEntity.ticksRemaining > 0)
+      invariant(playerEntity.discoverTicksRemaining > 0)
 
-      playerEntity.ticksRemaining -= 1
+      playerEntity.discoverTicksRemaining -= 1
       draft.player.energy -= 1
 
-      if (playerEntity.ticksRemaining === 0) {
+      if (playerEntity.discoverTicksRemaining === 0) {
         const updatedEntity = (draft.entities[
           playerEntity.id
         ] = {
           ...playerEntity,
           type: 'node',
+          mineTicksRemaining: MINE_TICKS,
         })
         onVisitEntity(draft, updatedEntity)
       }
