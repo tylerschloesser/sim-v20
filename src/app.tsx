@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import React, {
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -9,8 +10,8 @@ import invariant from 'tiny-invariant'
 import { Updater, useImmer } from 'use-immer'
 import './index.css'
 import { initState } from './init-state'
-import { AppState } from './types'
-import { entityPositionToId } from './util'
+import { AppState, Direction } from './types'
+import { move } from './util'
 import { Vec2 } from './vec2'
 
 export interface AppContext {
@@ -23,8 +24,10 @@ export function App() {
   const container = useRef<HTMLDivElement>(null)
   const [state, setState] = useImmer<AppState>(initState)
 
+  const tryMove = useTryMove(setState)
+
   useViewport(container, setState)
-  useKeyboard(setState)
+  useKeyboard(tryMove)
 
   useEffect(() => {
     const interval = self.setInterval(() => {
@@ -159,43 +162,36 @@ export function EntityComponent({
   )
 }
 
-function useKeyboard(setState: Updater<AppState>) {
+function useKeyboard(
+  tryMove: ReturnType<typeof useTryMove>,
+) {
   useEffect(() => {
     const abortController = new AbortController()
     const { signal } = abortController
     window.addEventListener(
       'keydown',
       (ev) => {
-        let delta: Vec2 | null = null
+        let direction: Direction | null = null
         switch (ev.code) {
           case 'KeyW': {
-            delta = new Vec2(0, -1)
+            direction = 'up'
             break
           }
           case 'KeyA': {
-            delta = new Vec2(-1, 0)
+            direction = 'left'
             break
           }
           case 'KeyS': {
-            delta = new Vec2(0, 1)
+            direction = 'down'
             break
           }
           case 'KeyD': {
-            delta = new Vec2(1, 0)
+            direction = 'right'
             break
           }
         }
-        if (delta) {
-          setState((draft) => {
-            const targetEntityId = entityPositionToId(
-              draft.player.position.add(delta),
-            )
-            const targetEntity =
-              draft.entities[targetEntityId]
-            if (targetEntity) {
-              draft.player.position = targetEntity.position
-            }
-          })
+        if (direction) {
+          tryMove(direction)
         }
       },
       { signal },
@@ -233,4 +229,30 @@ function useViewport(
       resizeObserver.disconnect()
     }
   }, [setState])
+}
+
+function useTryMove(setState: Updater<AppState>) {
+  return useCallback(
+    (direction: Direction) => {
+      setState((draft) => {
+        let delta: Vec2
+        switch (direction) {
+          case 'up':
+            delta = new Vec2(0, -1)
+            break
+          case 'down':
+            delta = new Vec2(0, 1)
+            break
+          case 'left':
+            delta = new Vec2(-1, 0)
+            break
+          case 'right':
+            delta = new Vec2(1, 0)
+            break
+        }
+        move(draft, delta)
+      })
+    },
+    [setState],
+  )
 }
