@@ -87,3 +87,6 @@ export function formatSeconds(seconds: number): string {
   const secondsLeft = Math.floor(seconds % 60)
   return `${minutes}:${String(secondsLeft).padStart(2, '0')}`
 }
+
+// @ts-expect-error
+export function toggleAction(draft: AppState): void {}

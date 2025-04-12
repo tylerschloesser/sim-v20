@@ -45,5 +45,3 @@ export interface AppState {
   spread: number
   entities: Record<string, Entity>
 }
-
-export type Direction = 'up' | 'down' | 'left' | 'right'

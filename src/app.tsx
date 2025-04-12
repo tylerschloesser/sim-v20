@@ -1,6 +1,5 @@
 import clsx from 'clsx'
 import React, {
-  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -14,18 +13,16 @@ import { EntityComponent } from './entity-component'
 import { initState } from './init-state'
 import { PlayerComponent } from './player-component'
 import { tickState } from './tick-state'
-import { AppState, Direction } from './types'
-import { move } from './util'
+import { AppState } from './types'
+import { move, toggleAction } from './util'
 import { Vec2 } from './vec2'
 
 export function App() {
   const container = useRef<HTMLDivElement>(null)
   const [state, setState] = useImmer<AppState>(initState)
 
-  const tryMove = useTryMove(setState)
-
   useViewport(container, setState)
-  useKeyboard(tryMove)
+  useKeyboard(setState)
 
   useEffect(() => {
     const interval = self.setInterval(() => {
@@ -102,37 +99,37 @@ export function WorldComponent() {
   )
 }
 
-function useKeyboard(
-  tryMove: ReturnType<typeof useTryMove>,
-) {
+function useKeyboard(setState: Updater<AppState>) {
   useEffect(() => {
     const abortController = new AbortController()
     const { signal } = abortController
     window.addEventListener(
       'keydown',
       (ev) => {
-        let direction: Direction | null = null
-        switch (ev.code) {
-          case 'KeyW': {
-            direction = 'up'
-            break
+        setState((draft) => {
+          switch (ev.code) {
+            case 'KeyW': {
+              move(draft, new Vec2(0, -1))
+              break
+            }
+            case 'KeyA': {
+              move(draft, new Vec2(-1, 0))
+              break
+            }
+            case 'KeyS': {
+              move(draft, new Vec2(0, 1))
+              break
+            }
+            case 'KeyD': {
+              move(draft, new Vec2(1, 0))
+              break
+            }
+            case 'Space': {
+              toggleAction(draft)
+              break
+            }
           }
-          case 'KeyA': {
-            direction = 'left'
-            break
-          }
-          case 'KeyS': {
-            direction = 'down'
-            break
-          }
-          case 'KeyD': {
-            direction = 'right'
-            break
-          }
-        }
-        if (direction) {
-          tryMove(direction)
-        }
+        })
       },
       { signal },
     )
@@ -169,30 +166,4 @@ function useViewport(
       resizeObserver.disconnect()
     }
   }, [setState])
-}
-
-function useTryMove(setState: Updater<AppState>) {
-  return useCallback(
-    (direction: Direction) => {
-      setState((draft) => {
-        let delta: Vec2
-        switch (direction) {
-          case 'up':
-            delta = new Vec2(0, -1)
-            break
-          case 'down':
-            delta = new Vec2(0, 1)
-            break
-          case 'left':
-            delta = new Vec2(-1, 0)
-            break
-          case 'right':
-            delta = new Vec2(1, 0)
-            break
-        }
-        move(draft, delta)
-      })
-    },
-    [setState],
-  )
 }
