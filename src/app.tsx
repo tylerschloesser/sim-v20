@@ -28,9 +28,14 @@ interface NodeEntity extends EntityBase {
 
 type Entity = RootEntity | NodeEntity
 
+interface Player {
+  position: Vec2
+  size: Vec2
+}
+
 interface AppState {
   viewport: Vec2
-  player: Vec2
+  player: Player
   scale: number
   spread: number
   entities: Record<string, Entity>
@@ -46,7 +51,10 @@ const AppContext = React.createContext<AppContext>(null!)
 function initState(): AppState {
   const state: AppState = {
     viewport: Vec2.ZERO,
-    player: Vec2.ZERO,
+    player: {
+      position: Vec2.ZERO,
+      size: new Vec2(1.5),
+    },
     scale: 1,
     spread: 3,
     entities: {},
@@ -153,18 +161,18 @@ export function WorldComponent() {
 export function PlayerComponent() {
   const { state } = useContext(AppContext)
 
-  const translate = state.player
+  const translate = state.player.position
+    .sub(state.player.size.div(2))
     .mul(state.scale)
     .add(state.viewport.div(2))
-    .sub(state.scale / 2)
 
   return (
     <div
       className={clsx('absolute', 'border-2 border-black')}
       style={{
         translate: `${translate.x}px ${translate.y}px`,
-        width: `${state.scale}px`,
-        height: `${state.scale}px`,
+        width: `${state.player.size.x * state.scale}px`,
+        height: `${state.player.size.y * state.scale}px`,
       }}
     ></div>
   )
