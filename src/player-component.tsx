@@ -14,8 +14,30 @@ export function PlayerComponent() {
           'border-2 border-black',
         )}
       ></div>
-      <div className={clsx('absolute bottom-full')}>
+      <div
+        className={clsx(
+          'absolute bottom-full p-1',
+          'text-xs',
+        )}
+      >
         Player
+      </div>
+      <div
+        className={clsx(
+          'absolute right-full top-0 bottom-0',
+          'pr-2',
+          'flex flex-row',
+          'text-xs',
+        )}
+      >
+        <div
+          className={clsx(
+            'flex-1',
+            'w-4',
+            'bg-green-400',
+            'border-2 border-black',
+          )}
+        ></div>
       </div>
     </div>
   )
