@@ -11,6 +11,7 @@ import { Updater, useImmer } from 'use-immer'
 import { TICK_DURATION } from './const'
 import './index.css'
 import { initState } from './init-state'
+import { tickState } from './tick-state'
 import {
   AppState,
   Direction,
@@ -36,9 +37,7 @@ export function App() {
 
   useEffect(() => {
     const interval = self.setInterval(() => {
-      setState((draft) => {
-        draft.tick += 1
-      })
+      setState(tickState)
     }, TICK_DURATION)
     return () => {
       self.clearInterval(interval)
