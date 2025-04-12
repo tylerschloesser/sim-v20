@@ -82,6 +82,7 @@ function UndiscoveredEntityComponentBody({
 interface RootEntityComponentBodyProps {
   entity: RootEntity
 }
+// @ts-expect-error
 function RootEntityComponentBody({
   entity,
 }: RootEntityComponentBodyProps) {
@@ -93,15 +94,14 @@ function RootEntityComponentBody({
         'flex justify-center items-center',
         'bg-green-400',
       )}
-    >
-      {entity.type}
-    </div>
+    ></div>
   )
 }
 
 interface NodeEntityComponentBodyProps {
   entity: NodeEntity
 }
+// @ts-expect-error
 function NodeEntityComponentBody({
   entity,
 }: NodeEntityComponentBodyProps) {
@@ -112,8 +112,6 @@ function NodeEntityComponentBody({
         'p-1',
         'flex justify-center items-center',
       )}
-    >
-      {entity.type}
-    </div>
+    ></div>
   )
 }
