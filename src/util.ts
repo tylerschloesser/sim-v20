@@ -64,3 +64,13 @@ export function move(draft: AppState, delta: Vec2): void {
     }
   }
 }
+
+export function ticksToSeconds(ticks: number): number {
+  return ticks / 10
+}
+
+export function formatSeconds(seconds: number): string {
+  const minutes = Math.floor(seconds / 60)
+  const secondsLeft = Math.floor(seconds % 60)
+  return `${minutes}:${String(secondsLeft).padStart(2, '0')}`
+}

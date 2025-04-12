@@ -16,7 +16,7 @@ import {
   Direction,
   UndiscoveredEntity,
 } from './types'
-import { move } from './util'
+import { formatSeconds, move, ticksToSeconds } from './util'
 import { Vec2 } from './vec2'
 
 export interface AppContext {
@@ -188,11 +188,21 @@ export function EntityComponent({
 interface UndiscoveredEntityComponentBodyProps {
   entity: UndiscoveredEntity
 }
-// @ts-expect-error
 function UndiscoveredEntityComponentBody({
   entity,
 }: UndiscoveredEntityComponentBodyProps) {
-  return <>TODO</>
+  const seconds = ticksToSeconds(entity.ticksRemaining)
+  return (
+    <div
+      className={clsx(
+        'w-full h-full',
+        'p-1',
+        'flex justify-center items-center',
+      )}
+    >
+      {formatSeconds(seconds)}
+    </div>
+  )
 }
 
 function useKeyboard(
