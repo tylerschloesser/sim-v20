@@ -19,12 +19,18 @@ export function addEntity(
 }
 
 export function move(draft: AppState, delta: Vec2): void {
-  draft.player.position = draft.player.position.add(delta)
-  const targetEntityId = entityPositionToId(
-    draft.player.position,
-  )
+  const targetPosition = draft.player.position.add(delta)
+  const targetEntityId = entityPositionToId(targetPosition)
   const targetEntity = draft.entities[targetEntityId]
-  invariant(targetEntity)
+  if (!targetEntity) {
+    return
+  }
+
+  draft.player.position = targetPosition
+
+  if (targetEntity.type === 'undiscovered') {
+    return
+  }
 
   for (const delta of [
     new Vec2(0, 1),
@@ -32,8 +38,7 @@ export function move(draft: AppState, delta: Vec2): void {
     new Vec2(0, -1),
     new Vec2(-1, 0),
   ]) {
-    const neighborPosition =
-      targetEntity.position.add(delta)
+    const neighborPosition = targetPosition.add(delta)
     const neighborId = entityPositionToId(neighborPosition)
     const neighborEntity = draft.entities[neighborId]
     if (!neighborEntity) {
