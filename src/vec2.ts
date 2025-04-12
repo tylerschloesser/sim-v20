@@ -110,6 +110,10 @@ export class Vec2 {
   static isEqual(a: Vec2, b: Vec2): boolean {
     return a.x === b.x && a.y === b.y
   }
+
+  toString(): string {
+    return `(${this.x}, ${this.y})`
+  }
 }
 
 export const ZVec2 = z.strictObject({
