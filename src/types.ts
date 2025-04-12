@@ -19,6 +19,9 @@ export interface UndiscoveredEntity extends EntityBase {
   ticksRemaining: number
 }
 
+export type Item = 'wood' | 'stone' | 'iron' | 'gold'
+export type Action = 'mine'
+
 export type Entity =
   | RootEntity
   | NodeEntity
@@ -28,6 +31,8 @@ export interface Player {
   position: Vec2
   size: Vec2
   energy: number
+  inventory: Partial<Record<Item, number>>
+  action: Action | null
 }
 
 export interface AppState {

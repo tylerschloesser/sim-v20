@@ -11,6 +11,8 @@ export function initState(): AppState {
       position: Vec2.ZERO,
       size: new Vec2(1.5),
       energy: MAX_PLAYER_ENERGY,
+      inventory: {},
+      action: null,
     },
     scale: 1,
     spread: SPREAD,
