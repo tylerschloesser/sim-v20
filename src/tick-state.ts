@@ -1,10 +1,11 @@
+import { omit } from 'lodash-es'
 import invariant from 'tiny-invariant'
 import {
   MAX_PLAYER_ENERGY,
   MINE_TICKS,
   ROOT_ENERGY_RECOVERY,
 } from './const'
-import { AppState } from './types'
+import { AppState, NodeEntity } from './types'
 import { entityPositionToId, onVisitEntity } from './util'
 
 export function tickState(draft: AppState): void {
@@ -41,10 +42,10 @@ export function tickState(draft: AppState): void {
         const updatedEntity = (draft.entities[
           playerEntity.id
         ] = {
-          ...playerEntity,
+          ...omit(playerEntity, 'discoverTicksRemaining'),
           type: 'node',
           mineTicksRemaining: MINE_TICKS,
-        })
+        } satisfies NodeEntity)
         onVisitEntity(draft, updatedEntity)
       }
       break
