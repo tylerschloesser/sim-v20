@@ -27,9 +27,7 @@ export function PlayerComponent() {
           'absolute bottom-full p-1',
           'text-xs',
         )}
-      >
-        Player
-      </div>
+      ></div>
       <EnergyBar energy={state.player.energy} />
       <InventoryGrid inventory={state.player.inventory} />
       <ActionDisplay />
@@ -149,7 +147,7 @@ function ActionDisplay() {
       >
         <div
           className={clsx(
-            'absolute inset-0 bg-blue-400',
+            'absolute inset-0 bg-gray-300',
             'origin-left',
           )}
           style={{
