@@ -2,7 +2,7 @@ import clsx from 'clsx'
 import React, { useContext } from 'react'
 import invariant from 'tiny-invariant'
 import { AppContext } from './app-context'
-import { UndiscoveredEntity } from './types'
+import { RootEntity, UndiscoveredEntity } from './types'
 import { useEntityStyle } from './use-entity-style'
 import { formatSeconds, ticksToSeconds } from './util'
 
@@ -21,6 +21,10 @@ export function EntityComponent({
 
   let body: React.ReactNode
   switch (entity.type) {
+    case 'root': {
+      body = <RootEntityComponentBody entity={entity} />
+      break
+    }
     case 'undiscovered':
       body = (
         <UndiscoveredEntityComponentBody entity={entity} />
@@ -63,6 +67,26 @@ function UndiscoveredEntityComponentBody({
       )}
     >
       {formatSeconds(seconds)}
+    </div>
+  )
+}
+
+interface RootEntityComponentBodyProps {
+  entity: RootEntity
+}
+function RootEntityComponentBody({
+  entity,
+}: RootEntityComponentBodyProps) {
+  return (
+    <div
+      className={clsx(
+        'w-full h-full',
+        'p-1',
+        'flex justify-center items-center',
+        'bg-green-400',
+      )}
+    >
+      {entity.type}
     </div>
   )
 }
