@@ -1,6 +1,10 @@
 import { isInteger } from 'lodash-es'
 import invariant from 'tiny-invariant'
 import {
+  DISCOVERY_CONSTANT,
+  DISCOVERY_EXPONENT,
+} from './const'
+import {
   AppState,
   NodeEntity,
   RootEntity,
@@ -61,7 +65,8 @@ export function onVisitEntity(
 
     if (!neighborEntity) {
       const ticksRemaining = Math.floor(
-        (neighborPosition.length() * 10) ** 2,
+        (neighborPosition.length() * DISCOVERY_CONSTANT) **
+          DISCOVERY_EXPONENT,
       )
       addEntity(draft, {
         type: 'undiscovered',
@@ -74,7 +79,7 @@ export function onVisitEntity(
 }
 
 export function ticksToSeconds(ticks: number): number {
-  return ticks / 10
+  return Math.ceil(ticks / 10)
 }
 
 export function formatSeconds(seconds: number): string {
