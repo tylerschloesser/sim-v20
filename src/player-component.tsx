@@ -1,7 +1,6 @@
 import clsx from 'clsx'
 import { useContext } from 'react'
 import { AppContext } from './app-context'
-import './index.css'
 import { useEntityStyle } from './use-entity-style'
 
 export function PlayerComponent() {

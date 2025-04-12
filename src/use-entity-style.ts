@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react'
-import './index.css'
 import { AppState } from './types'
 import { Vec2 } from './vec2'
 
