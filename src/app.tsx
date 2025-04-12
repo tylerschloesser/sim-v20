@@ -192,8 +192,13 @@ export function WorldComponent() {
   const entityIds = Object.keys(state.entities)
 
   const style = useMemo<React.CSSProperties>(() => {
-    return {}
-  }, [])
+    const { x, y } = state.player.position.mul(
+      state.scale * state.spread * -1,
+    )
+    return {
+      transform: `translate(${x}px, ${y}px)`,
+    }
+  }, [state.player.position, state.scale, state.spread])
 
   return (
     <div className={clsx('absolute')} style={style}>
