@@ -10,7 +10,11 @@ import invariant from 'tiny-invariant'
 import { Updater, useImmer } from 'use-immer'
 import './index.css'
 import { initState } from './init-state'
-import { AppState, Direction } from './types'
+import {
+  AppState,
+  Direction,
+  UndiscoveredEntity,
+} from './types'
 import { move } from './util'
 import { Vec2 } from './vec2'
 
@@ -152,6 +156,17 @@ export function EntityComponent({
 
   const style = useStyle(state, entity)
 
+  let body: React.ReactNode
+  switch (entity.type) {
+    case 'undiscovered':
+      body = (
+        <UndiscoveredEntityComponentBody entity={entity} />
+      )
+      break
+    default:
+      body = <>{entity.type}</>
+  }
+
   return (
     <div
       className={clsx(
@@ -164,9 +179,19 @@ export function EntityComponent({
       )}
       style={style}
     >
-      {entity.type}
+      {body}
     </div>
   )
+}
+
+interface UndiscoveredEntityComponentProps {
+  entity: UndiscoveredEntity
+}
+// @ts-expect-error
+function UndiscoveredEntityComponentBody({
+  entity,
+}: UndiscoveredEntityComponentProps) {
+  return <>TODO</>
 }
 
 function useKeyboard(
