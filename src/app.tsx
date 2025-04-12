@@ -8,6 +8,7 @@ import React, {
 } from 'react'
 import invariant from 'tiny-invariant'
 import { Updater, useImmer } from 'use-immer'
+import { AppContext } from './app-context'
 import { TICK_DURATION } from './const'
 import './index.css'
 import { initState } from './init-state'
@@ -19,12 +20,6 @@ import {
 } from './types'
 import { formatSeconds, move, ticksToSeconds } from './util'
 import { Vec2 } from './vec2'
-
-export interface AppContext {
-  state: AppState
-  setState: Updater<AppState>
-}
-const AppContext = React.createContext<AppContext>(null!)
 
 export function App() {
   const container = useRef<HTMLDivElement>(null)
