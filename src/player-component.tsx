@@ -1,10 +1,11 @@
 import clsx from 'clsx'
-import { Fragment, useContext } from 'react'
+import { Fragment, useContext, useMemo } from 'react'
 import invariant from 'tiny-invariant'
 import { AppContext } from './app-context'
 import { MAX_PLAYER_ENERGY } from './const'
-import { Inventory } from './types'
+import { Action, Inventory } from './types'
 import { useEntityStyle } from './use-entity-style'
+import { entityPositionToId } from './util'
 
 export function PlayerComponent() {
   const { state } = useContext(AppContext)
@@ -31,6 +32,7 @@ export function PlayerComponent() {
       </div>
       <EnergyBar energy={state.player.energy} />
       <InventoryGrid inventory={state.player.inventory} />
+      <ActionDisplay />
     </div>
   )
 }
@@ -81,7 +83,10 @@ function InventoryGrid({ inventory }: InventoryGridProps) {
       className={clsx('absolute left-full top-0', 'pl-2')}
     >
       <div
-        className={clsx('grid grid-cols-[1fr_1fr] gap-1')}
+        className={clsx(
+          'grid grid-cols-[1fr_1fr] gap-1',
+          'text-xs',
+        )}
       >
         {Object.entries(inventory).map(([item, count]) => (
           <Fragment key={item}>
@@ -89,6 +94,46 @@ function InventoryGrid({ inventory }: InventoryGridProps) {
             <div>{count}</div>
           </Fragment>
         ))}
+      </div>
+    </div>
+  )
+}
+
+function ActionDisplay() {
+  const { state } = useContext(AppContext)
+
+  const availableAction = useMemo<Action | null>(() => {
+    const currentEntity =
+      state.entities[
+        entityPositionToId(state.player.position)
+      ]
+    invariant(currentEntity)
+    if (currentEntity.type === 'node') {
+      return 'mine'
+    }
+    return null
+  }, [state.player, state.entities])
+
+  return (
+    <div
+      className={clsx(
+        'absolute top-full left-0 right-0',
+        'pt-2',
+        'text-xs',
+      )}
+    >
+      <div
+        className={clsx(
+          'border-2 border-black p-1',
+          'text-center',
+          {
+            'opacity-50': !availableAction,
+          },
+        )}
+      >
+        {availableAction
+          ? `[${availableAction}]`
+          : '[none]'}
       </div>
     </div>
   )
