@@ -23,7 +23,8 @@ export function App() {
   const container = useRef<HTMLDivElement>(null)
   const [state, setState] = useImmer<AppState>(initState)
 
-  useResize(container, setState)
+  useViewport(container, setState)
+  useKeyboard(setState)
 
   const context = useMemo(
     () => ({
@@ -32,51 +33,6 @@ export function App() {
     }),
     [state, setState],
   )
-
-  useEffect(() => {
-    const abortController = new AbortController()
-    const { signal } = abortController
-    window.addEventListener(
-      'keydown',
-      (ev) => {
-        let delta: Vec2 | null = null
-        switch (ev.code) {
-          case 'KeyW': {
-            delta = new Vec2(0, -1)
-            break
-          }
-          case 'KeyA': {
-            delta = new Vec2(-1, 0)
-            break
-          }
-          case 'KeyS': {
-            delta = new Vec2(0, 1)
-            break
-          }
-          case 'KeyD': {
-            delta = new Vec2(1, 0)
-            break
-          }
-        }
-        if (delta) {
-          setState((draft) => {
-            const targetEntityId = entityPositionToId(
-              draft.player.position.add(delta),
-            )
-            const targetEntity =
-              draft.entities[targetEntityId]
-            if (targetEntity) {
-              draft.player.position = targetEntity.position
-            }
-          })
-        }
-      },
-      { signal },
-    )
-    return () => {
-      abortController.abort()
-    }
-  }, [])
 
   return (
     <div className={clsx('w-dvw h-dvh')} ref={container}>
@@ -176,7 +132,54 @@ export function EntityComponent({
   )
 }
 
-function useResize(
+function useKeyboard(setState: Updater<AppState>) {
+  useEffect(() => {
+    const abortController = new AbortController()
+    const { signal } = abortController
+    window.addEventListener(
+      'keydown',
+      (ev) => {
+        let delta: Vec2 | null = null
+        switch (ev.code) {
+          case 'KeyW': {
+            delta = new Vec2(0, -1)
+            break
+          }
+          case 'KeyA': {
+            delta = new Vec2(-1, 0)
+            break
+          }
+          case 'KeyS': {
+            delta = new Vec2(0, 1)
+            break
+          }
+          case 'KeyD': {
+            delta = new Vec2(1, 0)
+            break
+          }
+        }
+        if (delta) {
+          setState((draft) => {
+            const targetEntityId = entityPositionToId(
+              draft.player.position.add(delta),
+            )
+            const targetEntity =
+              draft.entities[targetEntityId]
+            if (targetEntity) {
+              draft.player.position = targetEntity.position
+            }
+          })
+        }
+      },
+      { signal },
+    )
+    return () => {
+      abortController.abort()
+    }
+  }, [])
+}
+
+function useViewport(
   container: React.RefObject<HTMLDivElement | null>,
   setState: Updater<AppState>,
 ) {
