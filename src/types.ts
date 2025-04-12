@@ -27,6 +27,7 @@ export type Entity =
 export interface Player {
   position: Vec2
   size: Vec2
+  energy: number
 }
 
 export interface AppState {

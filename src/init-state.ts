@@ -1,4 +1,4 @@
-import { SPREAD } from './const'
+import { INITIAL_PLAYER_ENERGY, SPREAD } from './const'
 import { AppState } from './types'
 import { addEntity } from './util'
 import { Vec2 } from './vec2'
@@ -10,6 +10,7 @@ export function initState(): AppState {
     player: {
       position: Vec2.ZERO,
       size: new Vec2(1.5),
+      energy: INITIAL_PLAYER_ENERGY,
     },
     scale: 1,
     spread: SPREAD,
