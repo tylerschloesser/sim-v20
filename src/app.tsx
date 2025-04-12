@@ -33,6 +33,7 @@ interface Entity {
   id: string
   position: Vec2
   size: Vec2
+  label: string
 }
 
 interface World {
@@ -51,24 +52,22 @@ function initWorld(): World {
     entities: {},
     nextEntityId: 0,
   }
-  function addEntity({
-    position,
-    size,
-  }: Omit<Entity, 'id'>) {
+  function addEntity(partial: Omit<Entity, 'id'>) {
     const id = `${world.nextEntityId++}`
     world.entities[id] = {
       id,
-      position: position,
-      size: size,
+      ...partial,
     }
   }
   addEntity({
     position: new Vec2(0, 0),
     size: new Vec2(1, 1),
+    label: 'Chilling',
   })
   addEntity({
     position: new Vec2(2, 0),
     size: new Vec2(1, 1),
+    label: 'Iron',
   })
   return world
 }
@@ -225,7 +224,7 @@ function EntityComponent({ entity }: EntityComponentProps) {
         'border-2 border-black bg-red-300',
       )}
     >
-      Iron
+      {entity.label}
     </div>
   )
 }
