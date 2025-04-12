@@ -72,6 +72,7 @@ function UndiscoveredEntityComponentBody({
         'w-full h-full',
         'p-1',
         'flex justify-center items-center',
+        'text-xs',
       )}
     >
       {formatSeconds(seconds)}
