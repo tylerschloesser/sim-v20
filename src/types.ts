@@ -1,0 +1,30 @@
+import { Vec2 } from './vec2'
+
+export interface EntityBase {
+  id: string
+  position: Vec2
+  size: Vec2
+}
+
+export interface RootEntity extends EntityBase {
+  type: 'root'
+}
+
+export interface NodeEntity extends EntityBase {
+  type: 'node'
+}
+
+export type Entity = RootEntity | NodeEntity
+
+export interface Player {
+  position: Vec2
+  size: Vec2
+}
+
+export interface AppState {
+  viewport: Vec2
+  player: Player
+  scale: number
+  spread: number
+  entities: Record<string, Entity>
+}

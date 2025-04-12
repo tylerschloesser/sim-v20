@@ -9,43 +9,14 @@ import React, {
 import invariant from 'tiny-invariant'
 import { Updater, useImmer } from 'use-immer'
 import './index.css'
+import { AppState, Entity } from './types'
 import { entityPositionToId } from './util'
 import { Vec2 } from './vec2'
 
-interface EntityBase {
-  id: string
-  position: Vec2
-  size: Vec2
-}
-
-interface RootEntity extends EntityBase {
-  type: 'root'
-}
-
-interface NodeEntity extends EntityBase {
-  type: 'node'
-}
-
-type Entity = RootEntity | NodeEntity
-
-interface Player {
-  position: Vec2
-  size: Vec2
-}
-
-interface AppState {
-  viewport: Vec2
-  player: Player
-  scale: number
-  spread: number
-  entities: Record<string, Entity>
-}
-
-interface AppContext {
+export interface AppContext {
   state: AppState
   setState: Updater<AppState>
 }
-
 const AppContext = React.createContext<AppContext>(null!)
 
 function initState(): AppState {
@@ -56,7 +27,7 @@ function initState(): AppState {
       size: new Vec2(1.5),
     },
     scale: 1,
-    spread: 3,
+    spread: 2.5,
     entities: {},
   }
 
