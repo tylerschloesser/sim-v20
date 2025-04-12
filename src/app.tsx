@@ -32,6 +32,7 @@ interface AppState {
   viewport: Vec2
   player: Vec2
   scale: number
+  spread: number
   entities: Record<string, Entity>
 }
 
@@ -47,6 +48,7 @@ function initState(): AppState {
     viewport: Vec2.ZERO,
     player: Vec2.ZERO,
     scale: 1,
+    spread: 3,
     entities: {},
   }
 
@@ -180,5 +182,22 @@ export function EntityComponent({
   const { state } = useContext(AppContext)
   const entity = state.entities[entityId]
   invariant(entity)
-  return <>{entity.type}</>
+
+  const translate = entity.position
+    .mul(state.scale * state.spread)
+    .add(state.viewport.div(2))
+    .sub(state.scale / 2)
+
+  return (
+    <div
+      className={clsx('absolute')}
+      style={{
+        translate: `${translate.x}px ${translate.y}px`,
+        width: `${entity.size.x * state.scale}px`,
+        height: `${entity.size.y * state.scale}px`,
+      }}
+    >
+      {entity.type}
+    </div>
+  )
 }
