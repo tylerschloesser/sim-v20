@@ -114,6 +114,10 @@ function ActionDisplay() {
     return null
   }, [state.player, state.entities])
 
+  if (state.player.action) {
+    invariant(state.player.action === availableAction)
+  }
+
   return (
     <div
       className={clsx(
@@ -128,6 +132,7 @@ function ActionDisplay() {
           'text-center',
           {
             'opacity-50': !availableAction,
+            'bg-blue-400': state.player.action,
           },
         )}
       >

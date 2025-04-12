@@ -38,6 +38,7 @@ export function move(draft: AppState, delta: Vec2): void {
     return
   }
 
+  draft.player.action = null
   draft.player.position = targetPosition
 
   if (targetEntity.type === 'undiscovered') {
@@ -88,5 +89,19 @@ export function formatSeconds(seconds: number): string {
   return `${minutes}:${String(secondsLeft).padStart(2, '0')}`
 }
 
-// @ts-expect-error
-export function toggleAction(draft: AppState): void {}
+export function toggleAction(draft: AppState): void {
+  if (draft.player.action || draft.player.energy === 0) {
+    draft.player.action = null
+    return
+  }
+
+  const currentEntityId = entityPositionToId(
+    draft.player.position,
+  )
+  const currentEntity = draft.entities[currentEntityId]
+  invariant(currentEntity)
+
+  if (currentEntity.type === 'node') {
+    draft.player.action = 'mine'
+  }
+}
