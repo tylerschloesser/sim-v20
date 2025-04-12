@@ -5,7 +5,7 @@ import {
   MINE_TICKS,
   ROOT_ENERGY_RECOVERY,
 } from './const'
-import { AppState, NodeEntity } from './types'
+import { AppState, Item, NodeEntity } from './types'
 import { entityPositionToId, onVisitEntity } from './util'
 
 export function tickState(draft: AppState): void {
@@ -26,6 +26,24 @@ export function tickState(draft: AppState): void {
           draft.player.energy + ROOT_ENERGY_RECOVERY,
           MAX_PLAYER_ENERGY,
         )
+      }
+      break
+    }
+    case 'node': {
+      if (draft.player.action === 'mine') {
+        invariant(draft.player.energy > 0)
+        invariant(playerEntity.mineTicksRemaining > 0)
+        draft.player.energy -= 1
+        if (draft.player.energy === 0) {
+          draft.player.action = null
+        }
+        playerEntity.mineTicksRemaining -= 1
+        if (playerEntity.mineTicksRemaining === 0) {
+          const item: Item = 'wood'
+          draft.player.inventory[item] =
+            (draft.player.inventory[item] ?? 0) + 1
+          playerEntity.mineTicksRemaining = MINE_TICKS
+        }
       }
       break
     }
