@@ -5,7 +5,7 @@ import { AppContext } from './app-context'
 import { MAX_ROBOT_ENERGY, MINE_TICKS } from './const'
 import { Inventory, Robot } from './types'
 import { useEntityStyle } from './use-entity-style'
-import { entityPositionToId } from './util'
+import { positionToId } from './util'
 
 export interface RobotComponentProps {
   robotId: string
@@ -38,9 +38,33 @@ export function RobotComponent({
           'text-xs',
         )}
       ></div>
+      <Status robot={robot} />
       <EnergyBar energy={robot.energy} />
       <InventoryGrid inventory={robot.inventory} />
       <ActionDisplay robot={robot} />
+    </div>
+  )
+}
+
+interface StatusProps {
+  robot: Robot
+}
+
+function Status({ robot }: StatusProps) {
+  const { state } = useContext(AppContext)
+  const label =
+    state.cursor.attachedRobotId === robot.id
+      ? '[attached]'
+      : '[detached]'
+  return (
+    <div
+      className={clsx(
+        'absolute bottom-full left-0 right-0',
+        'pb-2',
+        'text-xs text-center',
+      )}
+    >
+      {label}
     </div>
   )
 }
@@ -114,7 +138,7 @@ interface ActionDisplayProps {
 function ActionDisplay({ robot }: ActionDisplayProps) {
   const { state } = useContext(AppContext)
   const currentEntity =
-    state.entities[entityPositionToId(robot.position)]
+    state.entities[positionToId(robot.position)]
   invariant(currentEntity)
 
   const { action, progress } = useMemo(() => {

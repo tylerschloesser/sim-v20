@@ -17,7 +17,7 @@ import {
 } from './types'
 import { Vec2 } from './vec2'
 
-export function entityPositionToId(position: Vec2): string {
+export function positionToId(position: Vec2): string {
   return `${position.x},${position.y}`
 }
 
@@ -31,7 +31,7 @@ export function addEntity(
 ): Entity {
   invariant(isInteger(partial.position.x))
   invariant(isInteger(partial.position.y))
-  const id = entityPositionToId(partial.position)
+  const id = positionToId(partial.position)
   invariant(!state.entities[id])
   return (state.entities[id] = { ...partial, id })
 }
@@ -51,17 +51,20 @@ export function addResourceEntity(
 }
 
 export function move(draft: AppState, delta: Vec2): void {
-  const robot = Object.values(draft.robots).at(0)
-  invariant(robot)
-
-  const targetPosition = robot.position.add(delta)
-  const targetEntityId = entityPositionToId(targetPosition)
+  const targetPosition = draft.cursor.position.add(delta)
+  const targetEntityId = positionToId(targetPosition)
   const targetEntity = draft.entities[targetEntityId]
   if (!targetEntity) {
     return
   }
 
-  robot.position = targetPosition
+  draft.cursor.position = targetPosition
+
+  if (draft.cursor.attachedRobotId) {
+    const robot = draft.robots[draft.cursor.attachedRobotId]
+    invariant(robot)
+    robot.position = targetPosition
+  }
 
   if (targetEntity.type === 'undiscovered') {
     return
@@ -83,7 +86,7 @@ export function onVisitEntity(
     new Vec2(-2, 0),
   ]) {
     const neighborPosition = entity.position.add(delta)
-    const neighborId = entityPositionToId(neighborPosition)
+    const neighborId = positionToId(neighborPosition)
     const neighborEntity = draft.entities[neighborId]
 
     if (!neighborEntity) {
@@ -113,7 +116,7 @@ export function onVisitEntity(
     new Vec2(1, 1),
   ]) {
     const neighborPosition = entity.position.add(delta)
-    const neighborId = entityPositionToId(neighborPosition)
+    const neighborId = positionToId(neighborPosition)
     const neighborEntity = draft.entities[neighborId]
 
     if (!neighborEntity) {
@@ -137,10 +140,9 @@ export function formatSeconds(seconds: number): string {
 }
 
 export function toggleAction(draft: AppState): void {
-  const robot = Object.values(draft.robots).at(0)
-  invariant(robot)
-
-  const currentEntityId = entityPositionToId(robot.position)
+  const currentEntityId = positionToId(
+    draft.cursor.position,
+  )
   const currentEntity = draft.entities[currentEntityId]
   invariant(currentEntity)
 

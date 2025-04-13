@@ -74,17 +74,16 @@ export function WorldComponent() {
   const entityIds = Object.keys(state.entities)
   const robotIds = Object.keys(state.robots)
 
-  const robot = Object.values(state.robots).at(0)
-  invariant(robot)
+  const { cursor } = state
 
   const style = useMemo<React.CSSProperties>(() => {
-    const { x, y } = robot.position.mul(
+    const { x, y } = cursor.position.mul(
       state.scale * state.spread * -1,
     )
     return {
       translate: `${x}px ${y}px`,
     }
-  }, [robot.position, state.scale, state.spread])
+  }, [cursor.position, state.scale, state.spread])
 
   return (
     <div

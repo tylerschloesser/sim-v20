@@ -10,13 +10,13 @@ import {
   ResourceEntity,
   Robot,
 } from './types'
-import { entityPositionToId, onVisitEntity } from './util'
+import { positionToId, onVisitEntity } from './util'
 
 function tickRobot(draft: AppState, robot: Robot): void {
   invariant(robot.energy >= 0)
 
   const robotEntity =
-    draft.entities[entityPositionToId(robot.position)]
+    draft.entities[positionToId(robot.position)]
   invariant(robotEntity)
 
   switch (robotEntity.type) {

@@ -24,8 +24,10 @@ export function initState(): AppState {
     entities: {},
   }
 
+  // @ts-expect-error
   const robot = addRobot(state)
-  state.cursor.attachedRobotId = robot.id
+
+  // state.cursor.attachedRobotId = robot.id
 
   const root = addEntity(state, {
     type: 'root',
