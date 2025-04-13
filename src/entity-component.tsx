@@ -47,7 +47,9 @@ export function EntityComponent({
         'border-2 border-black',
         'overflow-hidden',
         {
-          'opacity-20': entity.type === 'undiscovered',
+          'opacity-20':
+            entity.type === 'undiscovered' ||
+            entity.type === 'node',
         },
       )}
       style={style}

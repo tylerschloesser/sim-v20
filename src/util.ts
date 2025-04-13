@@ -7,6 +7,8 @@ import {
 } from './const'
 import {
   AppState,
+  Entity,
+  NodeEntity,
   ResourceEntity,
   RootEntity,
   UndiscoveredEntity,
@@ -22,13 +24,14 @@ export function addEntity(
   partial:
     | Omit<RootEntity, 'id'>
     | Omit<ResourceEntity, 'id'>
-    | Omit<UndiscoveredEntity, 'id'>,
-): void {
+    | Omit<UndiscoveredEntity, 'id'>
+    | Omit<NodeEntity, 'id'>,
+): Entity {
   invariant(isInteger(partial.position.x))
   invariant(isInteger(partial.position.y))
   const id = entityPositionToId(partial.position)
   invariant(!state.entities[id])
-  state.entities[id] = { ...partial, id }
+  return (state.entities[id] = { ...partial, id })
 }
 
 export function addResourceEntity(
@@ -90,6 +93,29 @@ export function onVisitEntity(
         action: 'discover',
         discoverTicksRequired,
         discoverTicksRemaining: discoverTicksRequired,
+      })
+    }
+  }
+
+  for (const delta of [
+    new Vec2(-1, -1),
+    new Vec2(0, -1),
+    new Vec2(1, -1),
+    new Vec2(-1, 0),
+    new Vec2(1, 0),
+    new Vec2(-1, 1),
+    new Vec2(0, 1),
+    new Vec2(1, 1),
+  ]) {
+    const neighborPosition = entity.position.add(delta)
+    const neighborId = entityPositionToId(neighborPosition)
+    const neighborEntity = draft.entities[neighborId]
+
+    if (!neighborEntity) {
+      addEntity(draft, {
+        type: 'node',
+        position: neighborPosition,
+        size: new Vec2(0.2, 0.2),
       })
     }
   }
