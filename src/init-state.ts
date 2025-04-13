@@ -15,12 +15,17 @@ export function initState(): AppState {
     tick: 0,
     robots: {},
     nextRobotId: 0,
+    cursor: {
+      position: Vec2.ZERO,
+      attachedRobotId: null,
+    },
     scale: 1,
     spread: SPREAD,
     entities: {},
   }
 
-  addRobot(state)
+  const robot = addRobot(state)
+  state.cursor.attachedRobotId = robot.id
 
   const root = addEntity(state, {
     type: 'root',

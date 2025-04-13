@@ -39,10 +39,16 @@ export type Entity =
 export type Inventory = Partial<Record<Item, number>>
 
 export interface Robot {
+  id: string
   position: Vec2
   size: Vec2
   energy: number
   inventory: Inventory
+}
+
+export interface Cursor {
+  position: Vec2
+  attachedRobotId: string | null
 }
 
 export interface AppState {
@@ -50,6 +56,7 @@ export interface AppState {
   tick: number
   robots: Record<string, Robot>
   nextRobotId: number
+  cursor: Cursor
   scale: number
   spread: number
   entities: Record<string, Entity>

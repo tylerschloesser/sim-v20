@@ -11,6 +11,7 @@ import {
   Entity,
   NodeEntity,
   ResourceEntity,
+  Robot,
   RootEntity,
   UndiscoveredEntity,
 } from './types'
@@ -157,13 +158,14 @@ export function toggleAction(draft: AppState): void {
   }
 }
 
-export function addRobot(draft: AppState): void {
+export function addRobot(draft: AppState): Robot {
   const id = `${draft.nextRobotId++}`
   invariant(!draft.robots[id])
-  draft.robots[id] = {
+  return (draft.robots[id] = {
+    id,
     position: Vec2.ZERO,
     size: new Vec2(1.5),
     energy: MAX_ROBOT_ENERGY,
     inventory: {},
-  }
+  })
 }
