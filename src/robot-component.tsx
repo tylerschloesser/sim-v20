@@ -3,16 +3,26 @@ import { Fragment, useContext, useMemo } from 'react'
 import invariant from 'tiny-invariant'
 import { AppContext } from './app-context'
 import { MAX_ROBOT_ENERGY, MINE_TICKS } from './const'
-import { Inventory } from './types'
+import { Inventory, Robot } from './types'
 import { useEntityStyle } from './use-entity-style'
 import { entityPositionToId } from './util'
 
-export function RobotComponent() {
-  const { state } = useContext(AppContext)
-  const style = useEntityStyle(state, state.robot)
+export interface RobotComponentProps {
+  robotId: string
+}
 
-  invariant(state.robot.energy <= MAX_ROBOT_ENERGY)
-  invariant(state.robot.energy >= 0)
+export function RobotComponent({
+  robotId,
+}: RobotComponentProps) {
+  const { state } = useContext(AppContext)
+
+  const robot = state.robots[robotId]
+  invariant(robot)
+
+  const style = useEntityStyle(state, robot)
+
+  invariant(robot.energy <= MAX_ROBOT_ENERGY)
+  invariant(robot.energy >= 0)
 
   return (
     <div className={clsx('absolute')} style={style}>
@@ -28,9 +38,9 @@ export function RobotComponent() {
           'text-xs',
         )}
       ></div>
-      <EnergyBar energy={state.robot.energy} />
-      <InventoryGrid inventory={state.robot.inventory} />
-      <ActionDisplay />
+      <EnergyBar energy={robot.energy} />
+      <InventoryGrid inventory={robot.inventory} />
+      <ActionDisplay robot={robot} />
     </div>
   )
 }
@@ -97,11 +107,14 @@ function InventoryGrid({ inventory }: InventoryGridProps) {
   )
 }
 
-function ActionDisplay() {
-  const { state } = useContext(AppContext)
+interface ActionDisplayProps {
+  robot: Robot
+}
 
+function ActionDisplay({ robot }: ActionDisplayProps) {
+  const { state } = useContext(AppContext)
   const currentEntity =
-    state.entities[entityPositionToId(state.robot.position)]
+    state.entities[entityPositionToId(robot.position)]
   invariant(currentEntity)
 
   const { action, progress } = useMemo(() => {

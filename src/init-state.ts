@@ -1,9 +1,10 @@
 import invariant from 'tiny-invariant'
-import { MAX_ROBOT_ENERGY, SPREAD } from './const'
+import { SPREAD } from './const'
 import { AppState } from './types'
 import {
   addEntity,
   addResourceEntity,
+  addRobot,
   onVisitEntity,
 } from './util'
 import { Vec2 } from './vec2'
@@ -12,19 +13,14 @@ export function initState(): AppState {
   const state: AppState = {
     viewport: Vec2.ZERO,
     tick: 0,
-    robot: {
-      position: Vec2.ZERO,
-      size: new Vec2(1.5),
-      energy: MAX_ROBOT_ENERGY,
-      inventory: {
-        wood: 10,
-        stone: 5,
-      },
-    },
+    robots: {},
+    nextRobotId: 0,
     scale: 1,
     spread: SPREAD,
     entities: {},
   }
+
+  addRobot(state)
 
   const root = addEntity(state, {
     type: 'root',

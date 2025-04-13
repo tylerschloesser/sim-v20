@@ -4,23 +4,26 @@ import {
   MINE_TICKS,
   ROOT_ENERGY_RECOVERY,
 } from './const'
-import { AppState, Item, ResourceEntity } from './types'
+import {
+  AppState,
+  Item,
+  ResourceEntity,
+  Robot,
+} from './types'
 import { entityPositionToId, onVisitEntity } from './util'
 
-export function tickState(draft: AppState): void {
-  draft.tick += 1
-
-  invariant(draft.robot.energy >= 0)
+function tickRobot(draft: AppState, robot: Robot): void {
+  invariant(robot.energy >= 0)
 
   const robotEntity =
-    draft.entities[entityPositionToId(draft.robot.position)]
+    draft.entities[entityPositionToId(robot.position)]
   invariant(robotEntity)
 
   switch (robotEntity.type) {
     case 'root': {
-      if (draft.robot.energy < MAX_ROBOT_ENERGY) {
-        draft.robot.energy = Math.min(
-          draft.robot.energy + ROOT_ENERGY_RECOVERY,
+      if (robot.energy < MAX_ROBOT_ENERGY) {
+        robot.energy = Math.min(
+          robot.energy + ROOT_ENERGY_RECOVERY,
           MAX_ROBOT_ENERGY,
         )
       }
@@ -29,15 +32,15 @@ export function tickState(draft: AppState): void {
     case 'resource': {
       if (
         robotEntity.action === 'mine' &&
-        draft.robot.energy > 0
+        robot.energy > 0
       ) {
         invariant(robotEntity.mineTicksRemaining > 0)
-        draft.robot.energy -= 1
+        robot.energy -= 1
         robotEntity.mineTicksRemaining -= 1
         if (robotEntity.mineTicksRemaining === 0) {
           const item: Item = 'wood'
-          draft.robot.inventory[item] =
-            (draft.robot.inventory[item] ?? 0) + 1
+          robot.inventory[item] =
+            (robot.inventory[item] ?? 0) + 1
           robotEntity.mineTicksRemaining = MINE_TICKS
         }
       }
@@ -46,12 +49,12 @@ export function tickState(draft: AppState): void {
     case 'undiscovered': {
       if (
         robotEntity.action === 'discover' &&
-        draft.robot.energy > 0
+        robot.energy > 0
       ) {
         invariant(robotEntity.discoverTicksRemaining > 0)
 
         robotEntity.discoverTicksRemaining -= 1
-        draft.robot.energy -= 1
+        robot.energy -= 1
 
         if (robotEntity.discoverTicksRemaining === 0) {
           const updatedEntity = (draft.entities[
@@ -69,5 +72,13 @@ export function tickState(draft: AppState): void {
       }
       break
     }
+  }
+}
+
+export function tickState(draft: AppState): void {
+  draft.tick += 1
+
+  for (const robot of Object.values(draft.robots)) {
+    tickRobot(draft, robot)
   }
 }

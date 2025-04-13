@@ -48,7 +48,8 @@ export interface Robot {
 export interface AppState {
   viewport: Vec2
   tick: number
-  robot: Robot
+  robots: Record<string, Robot>
+  nextRobotId: number
   scale: number
   spread: number
   entities: Record<string, Entity>

@@ -72,22 +72,28 @@ function TickComponent() {
 export function WorldComponent() {
   const { state } = useContext(AppContext)
   const entityIds = Object.keys(state.entities)
+  const robotIds = Object.keys(state.robots)
+
+  const robot = Object.values(state.robots).at(0)
+  invariant(robot)
 
   const style = useMemo<React.CSSProperties>(() => {
-    const { x, y } = state.robot.position.mul(
+    const { x, y } = robot.position.mul(
       state.scale * state.spread * -1,
     )
     return {
       translate: `${x}px ${y}px`,
     }
-  }, [state.robot.position, state.scale, state.spread])
+  }, [robot.position, state.scale, state.spread])
 
   return (
     <div
       className={clsx('absolute inset-0 overflow-hidden')}
     >
       <div className={clsx('absolute')} style={style}>
-        <RobotComponent />
+        {robotIds.map((robotId) => (
+          <RobotComponent key={robotId} robotId={robotId} />
+        ))}
         {entityIds.map((entityId) => (
           <EntityComponent
             key={entityId}

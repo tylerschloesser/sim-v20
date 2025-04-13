@@ -3,6 +3,7 @@ import invariant from 'tiny-invariant'
 import {
   DISCOVERY_CONSTANT,
   DISCOVERY_EXPONENT,
+  MAX_ROBOT_ENERGY,
   MINE_TICKS,
 } from './const'
 import {
@@ -49,14 +50,17 @@ export function addResourceEntity(
 }
 
 export function move(draft: AppState, delta: Vec2): void {
-  const targetPosition = draft.robot.position.add(delta)
+  const robot = Object.values(draft.robots).at(0)
+  invariant(robot)
+
+  const targetPosition = robot.position.add(delta)
   const targetEntityId = entityPositionToId(targetPosition)
   const targetEntity = draft.entities[targetEntityId]
   if (!targetEntity) {
     return
   }
 
-  draft.robot.position = targetPosition
+  robot.position = targetPosition
 
   if (targetEntity.type === 'undiscovered') {
     return
@@ -132,9 +136,10 @@ export function formatSeconds(seconds: number): string {
 }
 
 export function toggleAction(draft: AppState): void {
-  const currentEntityId = entityPositionToId(
-    draft.robot.position,
-  )
+  const robot = Object.values(draft.robots).at(0)
+  invariant(robot)
+
+  const currentEntityId = entityPositionToId(robot.position)
   const currentEntity = draft.entities[currentEntityId]
   invariant(currentEntity)
 
@@ -149,5 +154,16 @@ export function toggleAction(draft: AppState): void {
         currentEntity.action === null ? 'mine' : null
       break
     }
+  }
+}
+
+export function addRobot(draft: AppState): void {
+  const id = `${draft.nextRobotId++}`
+  invariant(!draft.robots[id])
+  draft.robots[id] = {
+    position: Vec2.ZERO,
+    size: new Vec2(1.5),
+    energy: MAX_ROBOT_ENERGY,
+    inventory: {},
   }
 }
