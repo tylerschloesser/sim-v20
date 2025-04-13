@@ -8,7 +8,12 @@ import {
 import { AppContext } from './app-context'
 import { EntityComponent } from './entity-component'
 import { RobotComponent } from './robot-component'
-import { useSmooth } from './use-smooth'
+import { SmoothConfig, useSmooth } from './use-smooth'
+
+const SMOOTH_CONFIG: SmoothConfig = {
+  exponent: 1.4,
+  constant: 0.8,
+}
 
 export function WorldComponent() {
   const container = useRef<HTMLDivElement>(null)
@@ -30,7 +35,7 @@ export function WorldComponent() {
     target.current = translate
   }, [translate])
 
-  useSmooth(container, target)
+  useSmooth(container, target, SMOOTH_CONFIG)
 
   return (
     <div

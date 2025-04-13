@@ -10,10 +10,7 @@ export interface SmoothConfig {
 export function useSmooth(
   container: RefObject<HTMLDivElement | null>,
   target: RefObject<Vec2>,
-  config: SmoothConfig = {
-    exponent: 1.4,
-    constant: 0.8,
-  },
+  config: SmoothConfig,
 ): void {
   useEffect(() => {
     let translate = target.current
