@@ -2,9 +2,18 @@ import { RefObject, useEffect } from 'react'
 import invariant from 'tiny-invariant'
 import { Vec2 } from './vec2'
 
+export interface SmoothConfig {
+  exponent: number
+  constant: number
+}
+
 export function useSmooth(
   container: RefObject<HTMLDivElement | null>,
   target: RefObject<Vec2>,
+  config: SmoothConfig = {
+    exponent: 1.4,
+    constant: 0.8,
+  },
 ): void {
   useEffect(() => {
     let translate = target.current
@@ -15,7 +24,12 @@ export function useSmooth(
       const dt = (now - lastFrame) / 1000
       lastFrame = now
 
-      translate = smooth(translate, target.current, dt)
+      translate = smooth(
+        translate,
+        target.current,
+        dt,
+        config,
+      )
 
       invariant(container.current)
       container.current.style.translate = `${translate.x}px ${translate.y}px`
@@ -33,6 +47,7 @@ function smooth(
   current: Vec2,
   target: Vec2,
   dt: number,
+  config: SmoothConfig,
 ): Vec2 {
   if (current.equals(target)) {
     return current
@@ -47,8 +62,8 @@ function smooth(
 
   const v = d
     .normalize()
-    .mul((len + 1) ** 1.4 - 1)
-    .mul(0.8)
+    .mul((len + 1) ** config.exponent - 1)
+    .mul(config.constant)
 
   if (v.mul(dt).length() > len) {
     return target

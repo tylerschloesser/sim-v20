@@ -11,9 +11,10 @@ import { AppContext } from './app-context'
 import { MAX_ROBOT_ENERGY, MINE_TICKS } from './const'
 import { Inventory, Robot } from './types'
 import {
-  useEntityOrRobotStyle,
+  useRobotStyle,
   useRobotTranslate,
 } from './use-entity-style'
+import { useSmooth } from './use-smooth'
 import { positionToId } from './util'
 
 export interface RobotComponentProps {
@@ -28,18 +29,24 @@ export function RobotComponent({
   const robot = state.robots[robotId]
   invariant(robot)
 
-  const style = useEntityOrRobotStyle(state, robot)
+  const style = useRobotStyle(state, robot)
   const translate = useRobotTranslate(state, robot)
   const target = useRef(translate)
   useEffect(() => {
     target.current = translate
   }, [translate])
+  const container = useRef<HTMLDivElement>(null)
+  useSmooth(container, target)
 
   invariant(robot.energy <= MAX_ROBOT_ENERGY)
   invariant(robot.energy >= 0)
 
   return (
-    <div className={clsx('absolute')} style={style}>
+    <div
+      ref={container}
+      className={clsx('absolute')}
+      style={style}
+    >
       <div
         className={clsx(
           'absolute inset-0',
