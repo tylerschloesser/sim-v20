@@ -49,14 +49,14 @@ export function addResourceEntity(
 }
 
 export function move(draft: AppState, delta: Vec2): void {
-  const targetPosition = draft.player.position.add(delta)
+  const targetPosition = draft.robot.position.add(delta)
   const targetEntityId = entityPositionToId(targetPosition)
   const targetEntity = draft.entities[targetEntityId]
   if (!targetEntity) {
     return
   }
 
-  draft.player.position = targetPosition
+  draft.robot.position = targetPosition
 
   if (targetEntity.type === 'undiscovered') {
     return
@@ -133,7 +133,7 @@ export function formatSeconds(seconds: number): string {
 
 export function toggleAction(draft: AppState): void {
   const currentEntityId = entityPositionToId(
-    draft.player.position,
+    draft.robot.position,
   )
   const currentEntity = draft.entities[currentEntityId]
   invariant(currentEntity)

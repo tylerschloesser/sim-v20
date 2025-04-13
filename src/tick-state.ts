@@ -1,6 +1,6 @@
 import invariant from 'tiny-invariant'
 import {
-  MAX_PLAYER_ENERGY,
+  MAX_ROBOT_ENERGY,
   MINE_TICKS,
   ROOT_ENERGY_RECOVERY,
 } from './const'
@@ -10,58 +10,56 @@ import { entityPositionToId, onVisitEntity } from './util'
 export function tickState(draft: AppState): void {
   draft.tick += 1
 
-  invariant(draft.player.energy >= 0)
+  invariant(draft.robot.energy >= 0)
 
-  const playerEntity =
-    draft.entities[
-      entityPositionToId(draft.player.position)
-    ]
-  invariant(playerEntity)
+  const robotEntity =
+    draft.entities[entityPositionToId(draft.robot.position)]
+  invariant(robotEntity)
 
-  switch (playerEntity.type) {
+  switch (robotEntity.type) {
     case 'root': {
-      if (draft.player.energy < MAX_PLAYER_ENERGY) {
-        draft.player.energy = Math.min(
-          draft.player.energy + ROOT_ENERGY_RECOVERY,
-          MAX_PLAYER_ENERGY,
+      if (draft.robot.energy < MAX_ROBOT_ENERGY) {
+        draft.robot.energy = Math.min(
+          draft.robot.energy + ROOT_ENERGY_RECOVERY,
+          MAX_ROBOT_ENERGY,
         )
       }
       break
     }
     case 'resource': {
       if (
-        playerEntity.action === 'mine' &&
-        draft.player.energy > 0
+        robotEntity.action === 'mine' &&
+        draft.robot.energy > 0
       ) {
-        invariant(playerEntity.mineTicksRemaining > 0)
-        draft.player.energy -= 1
-        playerEntity.mineTicksRemaining -= 1
-        if (playerEntity.mineTicksRemaining === 0) {
+        invariant(robotEntity.mineTicksRemaining > 0)
+        draft.robot.energy -= 1
+        robotEntity.mineTicksRemaining -= 1
+        if (robotEntity.mineTicksRemaining === 0) {
           const item: Item = 'wood'
-          draft.player.inventory[item] =
-            (draft.player.inventory[item] ?? 0) + 1
-          playerEntity.mineTicksRemaining = MINE_TICKS
+          draft.robot.inventory[item] =
+            (draft.robot.inventory[item] ?? 0) + 1
+          robotEntity.mineTicksRemaining = MINE_TICKS
         }
       }
       break
     }
     case 'undiscovered': {
       if (
-        playerEntity.action === 'discover' &&
-        draft.player.energy > 0
+        robotEntity.action === 'discover' &&
+        draft.robot.energy > 0
       ) {
-        invariant(playerEntity.discoverTicksRemaining > 0)
+        invariant(robotEntity.discoverTicksRemaining > 0)
 
-        playerEntity.discoverTicksRemaining -= 1
-        draft.player.energy -= 1
+        robotEntity.discoverTicksRemaining -= 1
+        draft.robot.energy -= 1
 
-        if (playerEntity.discoverTicksRemaining === 0) {
+        if (robotEntity.discoverTicksRemaining === 0) {
           const updatedEntity = (draft.entities[
-            playerEntity.id
+            robotEntity.id
           ] = {
-            id: playerEntity.id,
-            position: playerEntity.position,
-            size: playerEntity.size,
+            id: robotEntity.id,
+            position: robotEntity.position,
+            size: robotEntity.size,
             type: 'resource',
             action: null,
             mineTicksRemaining: MINE_TICKS,

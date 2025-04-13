@@ -2,17 +2,17 @@ import clsx from 'clsx'
 import { Fragment, useContext, useMemo } from 'react'
 import invariant from 'tiny-invariant'
 import { AppContext } from './app-context'
-import { MAX_PLAYER_ENERGY, MINE_TICKS } from './const'
+import { MAX_ROBOT_ENERGY, MINE_TICKS } from './const'
 import { Inventory } from './types'
 import { useEntityStyle } from './use-entity-style'
 import { entityPositionToId } from './util'
 
-export function PlayerComponent() {
+export function RobotComponent() {
   const { state } = useContext(AppContext)
-  const style = useEntityStyle(state, state.player)
+  const style = useEntityStyle(state, state.robot)
 
-  invariant(state.player.energy <= MAX_PLAYER_ENERGY)
-  invariant(state.player.energy >= 0)
+  invariant(state.robot.energy <= MAX_ROBOT_ENERGY)
+  invariant(state.robot.energy >= 0)
 
   return (
     <div className={clsx('absolute')} style={style}>
@@ -28,8 +28,8 @@ export function PlayerComponent() {
           'text-xs',
         )}
       ></div>
-      <EnergyBar energy={state.player.energy} />
-      <InventoryGrid inventory={state.player.inventory} />
+      <EnergyBar energy={state.robot.energy} />
+      <InventoryGrid inventory={state.robot.inventory} />
       <ActionDisplay />
     </div>
   )
@@ -63,7 +63,7 @@ function EnergyBar({ energy }: EnergyBarProps) {
             'origin-bottom',
           )}
           style={{
-            scale: `1 ${Math.floor((energy / MAX_PLAYER_ENERGY) * 100)}%`,
+            scale: `1 ${Math.floor((energy / MAX_ROBOT_ENERGY) * 100)}%`,
           }}
         />
       </div>
@@ -101,9 +101,7 @@ function ActionDisplay() {
   const { state } = useContext(AppContext)
 
   const currentEntity =
-    state.entities[
-      entityPositionToId(state.player.position)
-    ]
+    state.entities[entityPositionToId(state.robot.position)]
   invariant(currentEntity)
 
   const { action, progress } = useMemo(() => {

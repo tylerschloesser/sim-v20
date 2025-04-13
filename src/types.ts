@@ -38,7 +38,7 @@ export type Entity =
 
 export type Inventory = Partial<Record<Item, number>>
 
-export interface Player {
+export interface Robot {
   position: Vec2
   size: Vec2
   energy: number
@@ -48,7 +48,7 @@ export interface Player {
 export interface AppState {
   viewport: Vec2
   tick: number
-  player: Player
+  robot: Robot
   scale: number
   spread: number
   entities: Record<string, Entity>

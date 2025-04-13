@@ -1,5 +1,5 @@
 import invariant from 'tiny-invariant'
-import { MAX_PLAYER_ENERGY, SPREAD } from './const'
+import { MAX_ROBOT_ENERGY, SPREAD } from './const'
 import { AppState } from './types'
 import {
   addEntity,
@@ -12,10 +12,10 @@ export function initState(): AppState {
   const state: AppState = {
     viewport: Vec2.ZERO,
     tick: 0,
-    player: {
+    robot: {
       position: Vec2.ZERO,
       size: new Vec2(1.5),
-      energy: MAX_PLAYER_ENERGY,
+      energy: MAX_ROBOT_ENERGY,
       inventory: {
         wood: 10,
         stone: 5,

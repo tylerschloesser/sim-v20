@@ -11,7 +11,7 @@ import { AppContext } from './app-context'
 import { TICK_DURATION } from './const'
 import { EntityComponent } from './entity-component'
 import { initState } from './init-state'
-import { PlayerComponent } from './player-component'
+import { RobotComponent } from './robot-component'
 import { tickState } from './tick-state'
 import { AppState } from './types'
 import { move, toggleAction } from './util'
@@ -74,20 +74,20 @@ export function WorldComponent() {
   const entityIds = Object.keys(state.entities)
 
   const style = useMemo<React.CSSProperties>(() => {
-    const { x, y } = state.player.position.mul(
+    const { x, y } = state.robot.position.mul(
       state.scale * state.spread * -1,
     )
     return {
       translate: `${x}px ${y}px`,
     }
-  }, [state.player.position, state.scale, state.spread])
+  }, [state.robot.position, state.scale, state.spread])
 
   return (
     <div
       className={clsx('absolute inset-0 overflow-hidden')}
     >
       <div className={clsx('absolute')} style={style}>
-        <PlayerComponent />
+        <RobotComponent />
         {entityIds.map((entityId) => (
           <EntityComponent
             key={entityId}
