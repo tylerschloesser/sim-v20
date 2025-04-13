@@ -6,6 +6,13 @@ export function useEntityStyle(
   state: AppState,
   entity: { position: Vec2; size: Vec2 },
 ): React.CSSProperties {
+  return useEntityOrRobotStyle(state, entity)
+}
+
+function useEntityOrRobotStyle(
+  state: AppState,
+  entity: { position: Vec2; size: Vec2 },
+): React.CSSProperties {
   const translate = useMemo(
     () =>
       entity.position
