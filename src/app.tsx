@@ -14,7 +14,11 @@ import { initState } from './init-state'
 import { RobotComponent } from './robot-component'
 import { tickState } from './tick-state'
 import { AppState } from './types'
-import { move, toggleAction } from './util'
+import {
+  attachOrDetachRobot,
+  move,
+  toggleAction,
+} from './util'
 import { Vec2 } from './vec2'
 
 export function App() {
@@ -131,6 +135,10 @@ function useKeyboard(setState: Updater<AppState>) {
             }
             case 'Space': {
               toggleAction(draft)
+              break
+            }
+            case 'KeyQ': {
+              attachOrDetachRobot(draft)
               break
             }
           }

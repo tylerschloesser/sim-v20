@@ -171,3 +171,17 @@ export function addRobot(draft: AppState): Robot {
     inventory: {},
   })
 }
+
+export function attachOrDetachRobot(draft: AppState): void {
+  if (draft.cursor.attachedRobotId) {
+    draft.cursor.attachedRobotId = null
+    return
+  }
+
+  for (const robot of Object.values(draft.robots)) {
+    if (robot.position.equals(draft.cursor.position)) {
+      draft.cursor.attachedRobotId = robot.id
+      return
+    }
+  }
+}
