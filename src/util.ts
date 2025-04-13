@@ -7,7 +7,7 @@ import {
 } from './const'
 import {
   AppState,
-  NodeEntity,
+  ResourceEntity,
   RootEntity,
   UndiscoveredEntity,
 } from './types'
@@ -21,7 +21,7 @@ export function addEntity(
   state: AppState,
   partial:
     | Omit<RootEntity, 'id'>
-    | Omit<NodeEntity, 'id'>
+    | Omit<ResourceEntity, 'id'>
     | Omit<UndiscoveredEntity, 'id'>,
 ): void {
   invariant(isInteger(partial.position.x))
@@ -31,10 +31,10 @@ export function addEntity(
   state.entities[id] = { ...partial, id }
 }
 
-export function addNodeEntity(
+export function addResourceEntity(
   state: AppState,
   partial: Omit<
-    NodeEntity,
+    ResourceEntity,
     'id' | 'action' | 'mineTicksRemaining'
   >,
 ): void {
@@ -59,20 +59,20 @@ export function move(draft: AppState, delta: Vec2): void {
     return
   }
 
-  if (targetEntity.type === 'node') {
+  if (targetEntity.type === 'resource') {
     onVisitEntity(draft, targetEntity)
   }
 }
 
 export function onVisitEntity(
   draft: AppState,
-  entity: NodeEntity,
+  entity: ResourceEntity | RootEntity,
 ): void {
   for (const delta of [
-    new Vec2(0, 1),
-    new Vec2(1, 0),
-    new Vec2(0, -1),
-    new Vec2(-1, 0),
+    new Vec2(0, 2),
+    new Vec2(2, 0),
+    new Vec2(0, -2),
+    new Vec2(-2, 0),
   ]) {
     const neighborPosition = entity.position.add(delta)
     const neighborId = entityPositionToId(neighborPosition)
@@ -118,7 +118,7 @@ export function toggleAction(draft: AppState): void {
         currentEntity.action === null ? 'discover' : null
       break
     }
-    case 'node': {
+    case 'resource': {
       currentEntity.action =
         currentEntity.action === null ? 'mine' : null
       break

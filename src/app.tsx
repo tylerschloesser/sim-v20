@@ -109,19 +109,19 @@ function useKeyboard(setState: Updater<AppState>) {
         setState((draft) => {
           switch (ev.code) {
             case 'KeyW': {
-              move(draft, new Vec2(0, -1))
+              move(draft, new Vec2(0, -2))
               break
             }
             case 'KeyA': {
-              move(draft, new Vec2(-1, 0))
+              move(draft, new Vec2(-2, 0))
               break
             }
             case 'KeyS': {
-              move(draft, new Vec2(0, 1))
+              move(draft, new Vec2(0, 2))
               break
             }
             case 'KeyD': {
-              move(draft, new Vec2(1, 0))
+              move(draft, new Vec2(2, 0))
               break
             }
             case 'Space': {

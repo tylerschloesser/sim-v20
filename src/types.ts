@@ -10,8 +10,8 @@ export interface RootEntity extends EntityBase {
   type: 'root'
 }
 
-export interface NodeEntity extends EntityBase {
-  type: 'node'
+export interface ResourceEntity extends EntityBase {
+  type: 'resource'
   action: 'mine' | null
   mineTicksRemaining: number
 }
@@ -28,7 +28,7 @@ export type Action = 'mine' | 'discover'
 
 export type Entity =
   | RootEntity
-  | NodeEntity
+  | ResourceEntity
   | UndiscoveredEntity
 
 export type Inventory = Partial<Record<Item, number>>

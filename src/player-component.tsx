@@ -108,7 +108,7 @@ function ActionDisplay() {
 
   const { action, progress } = useMemo(() => {
     switch (currentEntity.type) {
-      case 'node': {
+      case 'resource': {
         const mineTicksRequired = MINE_TICKS
         const progress =
           1 -

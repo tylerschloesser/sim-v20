@@ -4,7 +4,7 @@ import {
   MINE_TICKS,
   ROOT_ENERGY_RECOVERY,
 } from './const'
-import { AppState, Item, NodeEntity } from './types'
+import { AppState, Item, ResourceEntity } from './types'
 import { entityPositionToId, onVisitEntity } from './util'
 
 export function tickState(draft: AppState): void {
@@ -28,7 +28,7 @@ export function tickState(draft: AppState): void {
       }
       break
     }
-    case 'node': {
+    case 'resource': {
       if (
         playerEntity.action === 'mine' &&
         draft.player.energy > 0
@@ -62,10 +62,10 @@ export function tickState(draft: AppState): void {
             id: playerEntity.id,
             position: playerEntity.position,
             size: playerEntity.size,
-            type: 'node',
+            type: 'resource',
             action: null,
             mineTicksRemaining: MINE_TICKS,
-          } satisfies NodeEntity)
+          } satisfies ResourceEntity)
           onVisitEntity(draft, updatedEntity)
         }
       }

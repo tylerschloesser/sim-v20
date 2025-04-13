@@ -3,7 +3,7 @@ import React, { useContext } from 'react'
 import invariant from 'tiny-invariant'
 import { AppContext } from './app-context'
 import {
-  NodeEntity,
+  ResourceEntity,
   RootEntity,
   UndiscoveredEntity,
 } from './types'
@@ -29,8 +29,8 @@ export function EntityComponent({
       body = <RootEntityComponentBody entity={entity} />
       break
     }
-    case 'node': {
-      body = <NodeEntityComponentBody entity={entity} />
+    case 'resource': {
+      body = <ResourceEntityComponentBody entity={entity} />
       break
     }
     case 'undiscovered':
@@ -99,13 +99,13 @@ function RootEntityComponentBody({
   )
 }
 
-interface NodeEntityComponentBodyProps {
-  entity: NodeEntity
+interface ResourceEntityComponentBodyProps {
+  entity: ResourceEntity
 }
 // @ts-expect-error
-function NodeEntityComponentBody({
+function ResourceEntityComponentBody({
   entity,
-}: NodeEntityComponentBodyProps) {
+}: ResourceEntityComponentBodyProps) {
   return (
     <div
       className={clsx(
