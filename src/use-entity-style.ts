@@ -9,18 +9,11 @@ export function useEntityStyle(
   return useEntityOrRobotStyle(state, entity)
 }
 
-function useEntityOrRobotStyle(
+export function useEntityOrRobotStyle(
   state: AppState,
   entity: { position: Vec2; size: Vec2 },
 ): React.CSSProperties {
-  const translate = useMemo(
-    () =>
-      entity.position
-        .mul(state.scale * state.spread)
-        .add(state.viewport.div(2))
-        .sub(entity.size.mul(state.scale / 2)),
-    [entity, state.scale, state.spread, state.viewport],
-  )
+  const translate = useEntityOrRobotTranslate(state, entity)
   return useMemo(
     () => ({
       translate: `${translate.x}px ${translate.y}px`,
@@ -28,5 +21,19 @@ function useEntityOrRobotStyle(
       height: `${entity.size.y * state.scale}px`,
     }),
     [translate, entity.size, state.scale],
+  )
+}
+
+function useEntityOrRobotTranslate(
+  state: AppState,
+  entity: { position: Vec2; size: Vec2 },
+): Vec2 {
+  return useMemo(
+    () =>
+      entity.position
+        .mul(state.scale * state.spread)
+        .add(state.viewport.div(2))
+        .sub(entity.size.mul(state.scale / 2)),
+    [entity, state.scale, state.spread, state.viewport],
   )
 }

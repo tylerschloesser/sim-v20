@@ -4,7 +4,7 @@ import invariant from 'tiny-invariant'
 import { AppContext } from './app-context'
 import { MAX_ROBOT_ENERGY, MINE_TICKS } from './const'
 import { Inventory, Robot } from './types'
-import { useEntityStyle } from './use-entity-style'
+import { useEntityOrRobotStyle } from './use-entity-style'
 import { positionToId } from './util'
 
 export interface RobotComponentProps {
@@ -19,7 +19,7 @@ export function RobotComponent({
   const robot = state.robots[robotId]
   invariant(robot)
 
-  const style = useEntityStyle(state, robot)
+  const style = useEntityOrRobotStyle(state, robot)
 
   invariant(robot.energy <= MAX_ROBOT_ENERGY)
   invariant(robot.energy >= 0)
