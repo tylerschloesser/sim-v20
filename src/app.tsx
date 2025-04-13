@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import React, {
+  RefObject,
   useContext,
   useEffect,
   useMemo,
@@ -73,6 +74,37 @@ function TickComponent() {
   )
 }
 
+function useSmooth(
+  container: RefObject<HTMLDivElement | null>,
+  target: RefObject<Vec2>,
+): void {
+  useEffect(() => {
+    let translate = target.current
+    let lastFrame = self.performance.now()
+    let handle: number
+    const callback: FrameRequestCallback = () => {
+      const now = self.performance.now()
+      // @ts-expect-error
+      const dt = now - lastFrame
+      lastFrame = now
+
+      if (!translate.equals(target.current)) {
+        // const d = target.current.sub(translate)
+        translate = target.current
+
+        invariant(container.current)
+        container.current.style.translate = `${translate.x}px ${translate.y}px`
+      }
+
+      handle = self.requestAnimationFrame(callback)
+    }
+    handle = self.requestAnimationFrame(callback)
+    return () => {
+      self.cancelAnimationFrame(handle)
+    }
+  }, [])
+}
+
 export function WorldComponent() {
   const container = useRef<HTMLDivElement>(null)
   const { state } = useContext(AppContext)
@@ -87,10 +119,13 @@ export function WorldComponent() {
     )
   }, [cursor.position, state.scale, state.spread])
 
+  const target = useRef(translate)
+
   useEffect(() => {
-    invariant(container.current)
-    container.current.style.translate = `${translate.x}px ${translate.y}px`
+    target.current = translate
   }, [translate])
+
+  useSmooth(container, target)
 
   return (
     <div
