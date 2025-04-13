@@ -8,22 +8,21 @@ import {
 } from 'react'
 import invariant from 'tiny-invariant'
 import { AppContext } from './app-context'
-import { MAX_ROBOT_ENERGY, MINE_TICKS } from './const'
+import {
+  MAX_ROBOT_ENERGY,
+  MINE_TICKS,
+  ROBOT_SMOOTH_CONFIG,
+} from './const'
 import { Inventory, Robot } from './types'
 import {
   useRobotStyle,
   useRobotTranslate,
 } from './use-entity-style'
-import { SmoothConfig, useSmooth } from './use-smooth'
+import { useSmooth } from './use-smooth'
 import { positionToId } from './util'
 
 export interface RobotComponentProps {
   robotId: string
-}
-
-const SMOOTH_CONFIG: SmoothConfig = {
-  exponent: 1.3,
-  constant: 1.1,
 }
 
 export function RobotComponent({
@@ -41,7 +40,7 @@ export function RobotComponent({
     target.current = translate
   }, [translate])
   const container = useRef<HTMLDivElement>(null)
-  useSmooth(container, target, SMOOTH_CONFIG)
+  useSmooth(container, target, ROBOT_SMOOTH_CONFIG)
 
   invariant(robot.energy <= MAX_ROBOT_ENERGY)
   invariant(robot.energy >= 0)
