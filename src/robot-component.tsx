@@ -14,11 +14,16 @@ import {
   useRobotStyle,
   useRobotTranslate,
 } from './use-entity-style'
-import { useSmooth } from './use-smooth'
+import { SmoothConfig, useSmooth } from './use-smooth'
 import { positionToId } from './util'
 
 export interface RobotComponentProps {
   robotId: string
+}
+
+const SMOOTH_CONFIG: SmoothConfig = {
+  exponent: 1.3,
+  constant: 1.1,
 }
 
 export function RobotComponent({
@@ -36,7 +41,7 @@ export function RobotComponent({
     target.current = translate
   }, [translate])
   const container = useRef<HTMLDivElement>(null)
-  useSmooth(container, target)
+  useSmooth(container, target, SMOOTH_CONFIG)
 
   invariant(robot.energy <= MAX_ROBOT_ENERGY)
   invariant(robot.energy >= 0)
