@@ -1,10 +1,19 @@
 import clsx from 'clsx'
-import { Fragment, useContext, useMemo } from 'react'
+import {
+  Fragment,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react'
 import invariant from 'tiny-invariant'
 import { AppContext } from './app-context'
 import { MAX_ROBOT_ENERGY, MINE_TICKS } from './const'
 import { Inventory, Robot } from './types'
-import { useEntityOrRobotStyle } from './use-entity-style'
+import {
+  useEntityOrRobotStyle,
+  useRobotTranslate,
+} from './use-entity-style'
 import { positionToId } from './util'
 
 export interface RobotComponentProps {
@@ -20,6 +29,11 @@ export function RobotComponent({
   invariant(robot)
 
   const style = useEntityOrRobotStyle(state, robot)
+  const translate = useRobotTranslate(state, robot)
+  const target = useRef(translate)
+  useEffect(() => {
+    target.current = translate
+  }, [translate])
 
   invariant(robot.energy <= MAX_ROBOT_ENERGY)
   invariant(robot.energy >= 0)
