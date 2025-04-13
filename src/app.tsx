@@ -1,6 +1,5 @@
 import clsx from 'clsx'
 import React, {
-  RefObject,
   useContext,
   useEffect,
   useMemo,
@@ -10,9 +9,7 @@ import invariant from 'tiny-invariant'
 import { Updater, useImmer } from 'use-immer'
 import { AppContext } from './app-context'
 import { TICK_DURATION } from './const'
-import { EntityComponent } from './entity-component'
 import { initState } from './init-state'
-import { RobotComponent } from './robot-component'
 import { tickState } from './tick-state'
 import { AppState } from './types'
 import {
@@ -21,6 +18,7 @@ import {
   toggleAction,
 } from './util'
 import { Vec2 } from './vec2'
+import { WorldComponent } from './world-component'
 
 export function App() {
   const container = useRef<HTMLDivElement>(null)
@@ -70,78 +68,6 @@ function TickComponent() {
       )}
     >
       {state.tick}
-    </div>
-  )
-}
-
-function useSmooth(
-  container: RefObject<HTMLDivElement | null>,
-  target: RefObject<Vec2>,
-): void {
-  useEffect(() => {
-    let translate = target.current
-    let lastFrame = self.performance.now()
-    let handle: number
-    const callback: FrameRequestCallback = () => {
-      const now = self.performance.now()
-      // @ts-expect-error
-      const dt = now - lastFrame
-      lastFrame = now
-
-      if (!translate.equals(target.current)) {
-        // const d = target.current.sub(translate)
-        translate = target.current
-
-        invariant(container.current)
-        container.current.style.translate = `${translate.x}px ${translate.y}px`
-      }
-
-      handle = self.requestAnimationFrame(callback)
-    }
-    handle = self.requestAnimationFrame(callback)
-    return () => {
-      self.cancelAnimationFrame(handle)
-    }
-  }, [])
-}
-
-export function WorldComponent() {
-  const container = useRef<HTMLDivElement>(null)
-  const { state } = useContext(AppContext)
-  const entityIds = Object.keys(state.entities)
-  const robotIds = Object.keys(state.robots)
-
-  const { cursor } = state
-
-  const translate = useMemo(() => {
-    return cursor.position.mul(
-      state.scale * state.spread * -1,
-    )
-  }, [cursor.position, state.scale, state.spread])
-
-  const target = useRef(translate)
-
-  useEffect(() => {
-    target.current = translate
-  }, [translate])
-
-  useSmooth(container, target)
-
-  return (
-    <div
-      className={clsx('absolute inset-0 overflow-hidden')}
-    >
-      <div ref={container} className={clsx('absolute')}>
-        {robotIds.map((robotId) => (
-          <RobotComponent key={robotId} robotId={robotId} />
-        ))}
-        {entityIds.map((entityId) => (
-          <EntityComponent
-            key={entityId}
-            entityId={entityId}
-          />
-        ))}
-      </div>
     </div>
   )
 }
