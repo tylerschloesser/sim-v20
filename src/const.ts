@@ -13,8 +13,8 @@ export const ROOT_ENERGY_RECOVERY = 4
 export const MINE_TICKS = 20
 
 export const ROBOT_SMOOTH_CONFIG: SmoothConfig = {
-  exponent: 1.3,
-  constant: 1.1,
+  exponent: 1.2,
+  constant: 1.8,
 }
 
 export const WORLD_SMOOTH_CONFIG: SmoothConfig = {
